@@ -1,7 +1,10 @@
+--
 module Lib.SyntaxTree where
 
 import Lib.Tokens
 import Lib.Number
+import BooleanFormula (simplify)
+import Control.Exception (evaluate, NestedAtomically)
 
 newtype LeveledToken = LeveledToken (Token, Int)
  deriving (Show, Eq)
@@ -22,44 +25,70 @@ fst' :: LeveledToken -> Token
 fst' (LeveledToken (x, _)) = x
 
 data Expression
-    = SIMPLE Number'
-    | VAR    Char
-    | UNIX   (Token, Expression)
-    | BINIX  (Expression, Token, Expression)
+  = SIMPLE Number'
+  | VAR    Char
+  | UNIX   (Token, Expression)
+  | BINIX  (Expression, Token, Expression)
  deriving Show
 
 buildTree :: [LeveledToken] -> Expression
 buildTree [] = undefined
+-- One attributed tokens
 buildTree [LeveledToken (NUM   x, _)] = SIMPLE x
 buildTree [LeveledToken (PARAM x, _)] = VAR x
 buildTree [LeveledToken (PI,      _)] = SIMPLE pi
+-- Multiple attributes
 buildTree tokens = l where
- lowest = minimum tokens
- list = zip [1..] tokens
- lowestPos = fst $ head $ dropWhile (\(_, t) -> t /= lowest) list
- left  = map snd $ init $ take lowestPos list
- right = map snd $ drop lowestPos list
- l = if null left
-    then UNIX (fst' lowest, buildTree right)
-    else BINIX (buildTree left, fst' lowest, buildTree right)
+  -- The token what we searched for
+  lowest = minimum tokens
+  list = zip [1..] tokens
+  -- In order to find the corrrect operand we need to decide whether it is bound to left or right
+  li = if isInfixR (fst' lowest) then reverse list else list
+  lowestPos = fst $ head $ dropWhile (\(_, t) -> t /= lowest) $ reverse li
+  -- Separating the left and right side of the operand
+  left  = map snd $ init $ take lowestPos list
+  right = map snd $ drop lowestPos list
+  -- Recognizing unix operands
+  l = if null left
+  then UNIX (fst' lowest, buildTree right)
+  else BINIX (buildTree left, fst' lowest, buildTree right)
+
+reducing :: Number' -> Number' -> Number'
+reducing x period = x - period * floor (x / period)
 
 makeSyntax :: String -> Expression
 makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
+calculate (BINIX (SIMPLE n, DIV, SIMPLE d)) = n / d
 calculate (UNIX (MIN, exp)) = negate $ calculate exp
-calculate (UNIX (SIN, exp)) = sin $ calculate exp
-calculate (UNIX (COS, exp)) = cos $ calculate exp
+calculate (UNIX (SIN, exp)) = e where
+  si = reducing (calculate exp) $ Creal $ 2 * pi
+  e | si == (Creal     pi / 6) = Frac ( 1, 2)
+    | si == (Creal 5 * pi / 6) = Frac ( 1, 2)
+    | si == (Creal 7 * pi / 6) = Frac (-1, 2)
+    | otherwise = sin si
+calculate (UNIX (COS, exp)) = cos $ reducing (calculate exp) $ 2 * Creal pi
+calculate (UNIX (TAN, exp)) = tan $ calculate exp
+calculate (UNIX (CTG, exp)) = e where
+  ctg = (/) 1 $ tan $ calculate exp
+  e = if ctg == round ctg then round ctg else ctg
 calculate (BINIX (exp1, ADD, exp2)) = (+) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MIN, exp2)) = (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = (*) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, DIV, exp2)) = e where
   result = (/) (calculate exp1) (calculate exp2)
-  rnd = round' result
-  e = if result == rnd then rnd else result 
+  rnd = round result
+  e = if result == rnd then rnd else result
 calculate (BINIX (exp1, RAI, exp2)) = c where
   re = (**) (calculate exp1) (calculate exp2)
-  rre = round' re
+  rre = round re
   c = if re == rre then rre else re
 calculate _ = undefined
+
+simplifying :: Number' -> Number'
+simplifying x = if x == floor x then floor x else x
+
+evaluate :: String -> Number'
+evaluate = simplifying . calculate . makeSyntax

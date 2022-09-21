@@ -1,6 +1,7 @@
 module Lib.Tokens where
 
 import Lib.Number
+import Lib.CReal
 
 import Data.Char (isDigit, digitToInt, isLetter)
 import GHC.Integer (floatFromInteger)
@@ -11,9 +12,11 @@ data Token
     | MIN
     | MUL
     | DIV
+    | RAI
     | SIN
     | COS
-    | RAI
+    | TAN
+    | CTG
     | OP
     | CL
     | DOT
@@ -23,18 +26,11 @@ data Token
     | PARAM Char
  deriving (Show, Eq, Ord)
 
-isNum :: Token -> Bool
-isNum (NUM _) = True
-isNum _ = False
+isInfixR :: Token -> Bool
+isInfixR RAI = True
+isInfixR _ = False
 
-isParam :: Token -> Bool
-isParam (PARAM _) = True
-isParam _ = False
-
-makeDouble :: Int -> Int -> Number'
-makeDouble n1 n2 = Float (int2Float n1 + makeEnd (int2Float n2))
-
-makeEnd :: Float -> Float
+makeEnd :: CReal -> CReal
 makeEnd dl
  | dl < 1   = dl
  |otherwise = makeEnd $ dl / 10
@@ -43,7 +39,7 @@ fillingUp :: [Token] -> [Token]
 fillingUp [] = []
 fillingUp ((PURE n):(PARAM p):ts) = NUM (Integer (toInteger n)) : MUL : fillingUp (PARAM p:ts)
 fillingUp ((PARAM p1):(PARAM p2):ts) = PARAM p1 : MUL : fillingUp (PARAM p2:ts)
-fillingUp ((PURE n1):DOT:(PURE n2):ts) = NUM (makeDouble n1 n2) : fillingUp ts
+fillingUp ((PURE n1):DOT:(PURE n2):ts) = NUM (Creal (fromIntegral n1 + makeEnd (fromIntegral n2))) : fillingUp ts
 fillingUp ((PURE n):ts) = NUM (Integer (toInteger n)) : fillingUp ts
 fillingUp (t:ts) = t : fillingUp ts
 
@@ -58,9 +54,11 @@ stringToTokens ('(':        s) = OP  : stringToTokens s
 stringToTokens (')':        s) = CL  : stringToTokens s
 stringToTokens ('.':        s) = DOT : stringToTokens s
 stringToTokens ('p':'i':    s) = PI  : stringToTokens s
-stringToTokens (' ':        s) =        stringToTokens s
+stringToTokens (' ':        s) =       stringToTokens s
 stringToTokens ('s':'i':'n':s) = SIN : stringToTokens s
 stringToTokens ('c':'o':'s':s) = COS : stringToTokens s
+stringToTokens ('t':'a':'n':s) = TAN : stringToTokens s
+stringToTokens ('c':'t':'g':s) = CTG : stringToTokens s
 stringToTokens (x:xs)
     | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
     | isLetter x = PARAM x : stringToTokens xs
