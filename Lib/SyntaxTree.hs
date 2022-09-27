@@ -65,12 +65,19 @@ calculate (BINIX (SIMPLE n, DIV, SIMPLE d)) = n / d
 calculate (UNIX (MIN, exp)) = negate $ calculate exp
 calculate (UNIX (SIN, exp)) = e where
   si = reducing (calculate exp) $ Creal $ 2 * pi
-  e | si == (Creal     pi / 6) = Frac ( 1, 2)
+  e | si == 0 = Integer 0
+    | si == (Creal     pi / 6) = Frac ( 1, 2)
     | si == (Creal 5 * pi / 6) = Frac ( 1, 2)
     | si == (Creal 7 * pi / 6) = Frac (-1, 2)
     | otherwise = sin si
-calculate (UNIX (COS, exp)) = cos $ reducing (calculate exp) $ 2 * Creal pi
-calculate (UNIX (TAN, exp)) = tan $ calculate exp
+calculate (UNIX (COS, exp)) = e where
+  co = reducing (calculate exp) $ 2 * Creal pi
+  e | co == 0 = Integer 1
+    | co == (Creal pi / 3) = Frac (1, 2)
+    | co == (Creal pi / 2) = Integer 0
+    | co == (Creal 4 * pi / 3) = Frac (-1, 2)
+    | otherwise = cos co
+calculate (UNIX (TAN, exp)) = tan $ reducing (calculate exp) $ Creal pi
 calculate (UNIX (CTG, exp)) = e where
   ctg = (/) 1 $ tan $ calculate exp
   e = if ctg == round ctg then round ctg else ctg
@@ -79,7 +86,7 @@ calculate (BINIX (exp1, MIN, exp2)) = (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = (*) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, DIV, exp2)) = e where
   result = (/) (calculate exp1) (calculate exp2)
-  rnd = round result
+  rnd = floor result
   e = if result == rnd then rnd else result
 calculate (BINIX (exp1, RAI, exp2)) = c where
   re = (**) (calculate exp1) (calculate exp2)
@@ -87,8 +94,5 @@ calculate (BINIX (exp1, RAI, exp2)) = c where
   c = if re == rre then rre else re
 calculate _ = undefined
 
-simplifying :: Number' -> Number'
-simplifying x = if x == floor x then floor x else x
-
 evaluate :: String -> Number'
-evaluate = simplifying . calculate . makeSyntax
+evaluate = calculate . makeSyntax
