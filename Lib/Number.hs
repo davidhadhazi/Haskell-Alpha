@@ -155,6 +155,6 @@ instance Integral Number' where
 
 instance RealFrac Number' where
   properFraction (Integer i) = properFraction $ fromInteger i
-  properFraction (Creal c) = (floor c, Creal (if snd (properFraction c) < 0 then snd (properFraction c) + 1 else snd (properFraction c)))
+  properFraction (Creal c) = (floor c, Creal $ c - floor c)
   properFraction (Frac (n,d)) = properFraction (fromRational (fromInteger n / fromInteger d))
   properFraction _ = undefined
