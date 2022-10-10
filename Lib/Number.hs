@@ -17,7 +17,7 @@ isInteger _ = False
 
 instance Show Number' where
   show (Integer           i) = show i
-  show (Creal             c) = show c
+  show (Creal             c) = if c == floor c then show (floor c) else show c
   show (Frac     (num, dom)) = show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  "++ show (fromInteger num / fromInteger dom))
   show Undefined             = show "Undefinied"
 

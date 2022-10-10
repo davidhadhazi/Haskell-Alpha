@@ -3,8 +3,8 @@ module Lib.Tokens where
 import Lib.Number
 import Lib.CReal
 
-import Data.Char (isDigit, digitToInt, isLetter)
-import GHC.Integer (floatFromInteger)
+import Data.Char
+import GHC.Integer
 import GHC.Float
 
 data Token
@@ -13,6 +13,8 @@ data Token
     | MUL
     | DIV
     | RAI
+    | UNDER
+    | LOG
     | SIN
     | COS
     | TAN
@@ -20,6 +22,7 @@ data Token
     | OP
     | CL
     | DOT
+    | E
     | PI
     | PURE  Int
     | NUM   Number'
@@ -45,20 +48,24 @@ fillingUp (t:ts) = t : fillingUp ts
 
 stringToTokens :: String -> [Token]
 stringToTokens [] = []
-stringToTokens ('+':        s) = ADD : stringToTokens s
-stringToTokens ('-':        s) = MIN : stringToTokens s
-stringToTokens ('*':        s) = MUL : stringToTokens s
-stringToTokens ('/':        s) = DIV : stringToTokens s
-stringToTokens ('^':        s) = RAI : stringToTokens s
-stringToTokens ('(':        s) = OP  : stringToTokens s
-stringToTokens (')':        s) = CL  : stringToTokens s
-stringToTokens ('.':        s) = DOT : stringToTokens s
-stringToTokens ('p':'i':    s) = PI  : stringToTokens s
-stringToTokens (' ':        s) =       stringToTokens s
-stringToTokens ('s':'i':'n':s) = SIN : stringToTokens s
-stringToTokens ('c':'o':'s':s) = COS : stringToTokens s
-stringToTokens ('t':'a':'n':s) = TAN : stringToTokens s
-stringToTokens ('c':'t':'g':s) = CTG : stringToTokens s
+stringToTokens ('+':        s) = ADD   : stringToTokens s
+stringToTokens ('-':        s) = MIN   : stringToTokens s
+stringToTokens ('*':        s) = MUL   : stringToTokens s
+stringToTokens ('/':        s) = DIV   : stringToTokens s
+stringToTokens ('^':        s) = RAI   : stringToTokens s
+stringToTokens ('(':        s) = OP    : stringToTokens s
+stringToTokens (')':        s) = CL    : stringToTokens s
+stringToTokens ('.':        s) = DOT   : stringToTokens s
+stringToTokens ('p':'i':    s) = PI    : stringToTokens s
+stringToTokens ('e':        s) = E     : stringToTokens s
+stringToTokens (' ':        s) =         stringToTokens s
+stringToTokens ('l':'o':'g':'_':s) = list where
+ heads = takeWhile (/= ' ') s
+ list = (stringToTokens heads) ++ [LOG] ++ (stringToTokens $ dropWhile (/= ' ') s)
+stringToTokens ('s':'i':'n':s) = SIN   : stringToTokens s
+stringToTokens ('c':'o':'s':s) = COS   : stringToTokens s
+stringToTokens ('t':'a':'n':s) = TAN   : stringToTokens s
+stringToTokens ('c':'t':'g':s) = CTG   : stringToTokens s
 stringToTokens (x:xs)
     | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
     | isLetter x = PARAM x : stringToTokens xs

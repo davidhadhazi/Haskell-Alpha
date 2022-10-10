@@ -5,7 +5,10 @@ import Lib.Tokens
 import Lib.Number
 
 newtype LeveledToken = LeveledToken (Token, Int)
- deriving (Show, Eq)
+ deriving (Eq)
+
+instance Show LeveledToken where
+  show (LeveledToken (t, l)) = show (t, l)
 
 levelUp :: Int -> [Token] -> [LeveledToken]
 levelUp 0 [] = []
@@ -35,6 +38,7 @@ buildTree [] = undefined
 buildTree [LeveledToken (NUM   x, _)] = SIMPLE x
 buildTree [LeveledToken (PARAM x, _)] = VAR x
 buildTree [LeveledToken (PI,      _)] = SIMPLE pi
+buildTree [LeveledToken (E,       _)] = SIMPLE $ exp 1
 -- Multiple attributes
 buildTree tokens = l where
   -- The token what we searched for
@@ -47,9 +51,9 @@ buildTree tokens = l where
   left  = map snd $ init $ take lowestPos list
   right = map snd $ drop lowestPos list
   -- Recognizing unix operands
-  l = if null left
-  then UNIX (fst' lowest, buildTree right)
-  else BINIX (buildTree left, fst' lowest, buildTree right)
+  l
+   | null left = UNIX (fst' lowest, buildTree right)
+   | otherwise = BINIX (buildTree left, fst' lowest, buildTree right)
 
 reducing :: Number' -> Number' -> Number'
 reducing x period = x - period * floor (x / period)
@@ -59,7 +63,7 @@ makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
-calculate (BINIX (SIMPLE n, DIV, SIMPLE d)) = n / d
+--calculate (NUM n)          = n
 calculate (UNIX (MIN, exp)) = negate $ calculate exp
 calculate (UNIX (SIN, exp)) = e where
   si = reducing (calculate exp) $ Creal $ 2 * pi
@@ -90,6 +94,9 @@ calculate (UNIX (CTG, exp)) = e where
   ctg | ct == 0 = Integer 0
       |otherwise = 1 / tan ct
   e = if ctg == floor ctg then floor ctg else ctg
+calculate (BINIX (exp1, LOG, exp2)) = (/) (log (calculate exp2)) $ log $ calculate exp1
+  -- re = log $ calculate exp
+  -- e = if re == floor re then floor re else re
 calculate (BINIX (exp1, ADD, exp2)) = (+) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MIN, exp2)) = (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = (*) (calculate exp1) (calculate exp2)
