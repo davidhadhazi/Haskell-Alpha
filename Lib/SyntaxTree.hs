@@ -63,7 +63,6 @@ makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
---calculate (NUM n)          = n
 calculate (UNIX (MIN, exp)) = negate $ calculate exp
 calculate (UNIX (SIN, exp)) = e where
   si = reducing (calculate exp) $ Creal $ 2 * pi
@@ -91,23 +90,16 @@ calculate (UNIX (TAN, exp)) = e where
     | otherwise = tan ta
 calculate (UNIX (CTG, exp)) = e where
   ct = reducing (calculate exp) $ Creal pi
-  ctg | ct == 0 = Integer 0
+  e | ct == 0 = Integer 0
       |otherwise = 1 / tan ct
-  e = if ctg == floor ctg then floor ctg else ctg
 calculate (BINIX (exp1, LOG, exp2)) = (/) (log (calculate exp2)) $ log $ calculate exp1
-  -- re = log $ calculate exp
-  -- e = if re == floor re then floor re else re
-calculate (BINIX (exp1, ADD, exp2)) = (+) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, MIN, exp2)) = (-) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, MUL, exp2)) = (*) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, DIV, exp2)) = e where
-  result = (/) (calculate exp1) (calculate exp2)
-  rnd = floor result
-  e = if result == rnd then rnd else result
-calculate (BINIX (exp1, RAI, exp2)) = c where
-  re = (**) (calculate exp1) (calculate exp2)
-  rre = round re
-  c = if re == rre then rre else re
+calculate (UNIX (LOG10, exp)) = (/) (log (calculate exp)) $ log 10
+calculate (UNIX (LN, exp)) = log $ calculate exp
+calculate (BINIX (exp1, ADD, exp2)) =  (+) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MIN, exp2)) =  (-) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MUL, exp2)) =  (*) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, DIV, exp2)) =  (/) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, RAI, exp2)) = (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
 
 evaluate :: String -> Number'
