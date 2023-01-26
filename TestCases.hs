@@ -2,9 +2,9 @@ module TestCases where
 
 import Test.HUnit
 import Lib.Tokens
-import Lib.SyntaxTree (calculate, makeSyntax)
-import GHC.Arr (fill)
-import Lib.Number (Number'(Integer, Frac))
+import Lib.SyntaxTree
+import GHC.Arr
+import Lib.Number
 
 tokentest0 :: Test
 tokentest0 = TestCase (assertEqual "tokenNumber0" (stringToTokens "") [])
@@ -33,7 +33,8 @@ syntaxtest2 = TestCase (assertEqual "syntax1/2" (calculate (makeSyntax "1/2")) (
 
 syntaxes :: Test
 syntaxes = TestList [
-                     TestLabel "syntax1" syntaxtest1
+                     TestLabel "syntax1" syntaxtest1,
+                     TestLabel "syntax2" syntaxtest2
                      ]
 
 tests :: Test

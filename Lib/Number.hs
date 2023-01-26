@@ -130,7 +130,7 @@ instance Enum Number' where
 instance Integral Number' where
   quotRem (Integer i1) (Integer i2) = (Integer (quot i1 i2), Integer (rem i1 i2))
 
-  quotRem (Integer i) (Creal c) = (Integer (round (quot (fromInteger i) c)), Creal (rem (fromInteger i) c))
+  quotRem (Integer i) (Creal c) = (Integer (floor (quot (fromInteger i) c)), Creal (rem (fromInteger i) c))
 
   quotRem (Integer i) (Frac f) = quotRem (Frac (i, 1)) (Frac f)
 

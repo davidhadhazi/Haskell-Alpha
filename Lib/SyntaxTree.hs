@@ -1,4 +1,3 @@
---
 module Lib.SyntaxTree where
 
 import Lib.Tokens
@@ -93,6 +92,7 @@ calculate (UNIX (CTG, exp)) = e where
   e | ct == 0 = Integer 0
       |otherwise = 1 / tan ct
 calculate (BINIX (exp1, LOG, exp2)) = (/) (log (calculate exp2)) $ log $ calculate exp1
+<<<<<<< Updated upstream
 calculate (UNIX (LOG10, exp)) = (/) (log (calculate exp)) $ log 10
 calculate (UNIX (LN, exp)) = log $ calculate exp
 calculate (BINIX (exp1, ADD, exp2)) =  (+) (calculate exp1) (calculate exp2)
@@ -100,6 +100,19 @@ calculate (BINIX (exp1, MIN, exp2)) =  (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) =  (*) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, DIV, exp2)) =  (/) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, RAI, exp2)) = (**) (calculate exp1) (calculate exp2)
+=======
+calculate (BINIX (exp1, ADD, exp2)) = (+) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MIN, exp2)) = (-) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MUL, exp2)) = (*) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, DIV, exp2)) = e where
+  result = (/) (calculate exp1) (calculate exp2)
+  rnd = floor result
+  e = if result == rnd then rnd else result
+calculate (BINIX (exp1, RAI, exp2)) = c where
+  re = (**) (calculate exp1) (calculate exp2)
+  rre = round re
+  c = if re == rre then rre else re
+>>>>>>> Stashed changes
 calculate _ = undefined
 
 evaluate :: String -> Number'
