@@ -25,7 +25,24 @@ data Token
  | PURE  Int
  | NUM   Number'
  | PARAM Char
- deriving (Show, Eq, Ord)
+ deriving (Eq, Ord)
+
+instance Show Token where
+    show ADD = "+"
+    show MIN = "-"
+    show MUL = "*"
+    show DIV = "/"
+    show RAI = "^"
+    show LOG = "log_"
+    show LOG10 = "log"
+    show LN = "ln"
+    show SIN = "sin"
+    show COS = "cos"
+    show TAN = "tan"
+    show CTG = "ctg"
+    show E = "e"
+    show PI = "pi"
+    show _ = undefined
 
 isInfixR :: Token -> Bool
 isInfixR RAI = True
