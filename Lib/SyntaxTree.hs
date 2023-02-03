@@ -29,6 +29,7 @@ data Expression
   | VAR    Char
   | UNIX   (Token, Expression)
   | BINIX  (Expression, Token, Expression)
+ deriving (Eq)
 
 instance Show Expression where
   show (SIMPLE x) = show x
@@ -105,12 +106,6 @@ calculate (BINIX (exp1, MUL, exp2)) =  (*) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, DIV, exp2)) =  (/) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, RAI, exp2)) = (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
-
-calculateable :: Expression -> Bool
-calculateable (VAR _) = False
-calculateable (SIMPLE _) = True
-calculateable (UNIX (_, x)) = calculateable x
-calculateable (BINIX (exp1, _, exp2)) = (calculateable exp1) && (calculateable exp2)
 
 evaluate :: String -> Number'
 evaluate = calculate . makeSyntax

@@ -46,6 +46,7 @@ instance Show Token where
 
 isInfixR :: Token -> Bool
 isInfixR RAI = True
+isInfixR LOG = True
 isInfixR _ = False
 
 isOperator :: Token -> Bool
