@@ -1,7 +1,7 @@
-module Lib.Simplification where
+module Simplification where
 
-import Lib.SyntaxTree
-import Lib.Tokens
+import SyntaxTree
+import Tokens
 
 calculateable :: Expression -> Bool
 calculateable (VAR _) = False
@@ -17,8 +17,8 @@ reduce (BINIX (e, ADD, (SIMPLE 0))) = e
 reduce (BINIX ((SIMPLE 0), ADD, e)) = e
 reduce (BINIX (e, MUL, (SIMPLE 1))) = e
 reduce (BINIX ((SIMPLE 1), MUL, e)) = e
-reduce (BINIX (e, MUL, (SIMPLE 0))) = SIMPLE 0
-reduce (BINIX ((SIMPLE 0), MUL, e)) = SIMPLE 0
+reduce (BINIX (_, MUL, (SIMPLE 0))) = SIMPLE 0
+reduce (BINIX ((SIMPLE 0), MUL, _)) = SIMPLE 0
 reduce (BINIX ((SIMPLE n), MUL, BINIX ((SIMPLE m), DIV, e))) = BINIX ((SIMPLE (n * m)), DIV, e)
 reduce (BINIX ((BINIX ((SIMPLE m), DIV, e)), MUL, (SIMPLE n))) = BINIX ((SIMPLE (n * m)), DIV, e)
 reduce (BINIX ((BINIX (e1, t1, e2)), t2, e3))

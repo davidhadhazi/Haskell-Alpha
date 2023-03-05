@@ -1,4 +1,4 @@
-module Lib.CReal where
+module CReal where
 
 import Data.Ratio
 

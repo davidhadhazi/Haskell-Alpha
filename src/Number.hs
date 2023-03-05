@@ -1,9 +1,9 @@
-module Lib.Number where
+module Number where
 
 import GHC.Real
 import Data.Ratio
 import GHC.Float
-import Lib.CReal
+import CReal
 
 data Number'
   = Integer Integer

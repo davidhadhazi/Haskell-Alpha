@@ -1,7 +1,7 @@
-module Lib.Tokens where
+module Tokens where
 
-import Lib.Number
-import Lib.CReal
+import Number
+import CReal
 import Data.Char
 
 data Token

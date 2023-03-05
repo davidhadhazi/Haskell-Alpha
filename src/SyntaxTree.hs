@@ -1,7 +1,7 @@
-module Lib.SyntaxTree where
+module SyntaxTree where
 
-import Lib.Tokens
-import Lib.Number
+import Tokens
+import Number
 
 newtype LeveledToken = LeveledToken (Token, Int)
  deriving (Eq)
