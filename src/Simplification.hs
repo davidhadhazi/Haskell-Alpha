@@ -1,4 +1,4 @@
-module Simplification where
+module Simplification (simplifying) where
 
 import SyntaxTree
 import Tokens
@@ -61,4 +61,4 @@ unbracketing (SIMPLE n) = SIMPLE n
 unbracketing (VAR    x) = VAR    x
 
 simplifying :: Expression -> Expression
-simplifying e = if e == (reduce e) then e else simplifying $ reduce e
+simplifying e = if e == (reduce (unbracketing e)) then e else simplifying $ reduce $ unbracketing e

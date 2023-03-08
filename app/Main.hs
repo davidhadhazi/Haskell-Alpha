@@ -1,17 +1,19 @@
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module Main (main) where
 
 import Data.GI.Base
 import qualified GI.Gtk as Gtk
 import qualified Data.Text as T
 import qualified SyntaxTree as ST
+import qualified Simplification as SM
+import qualified Derivate as DV
 
 eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) ->IO ()
 eval ent1 ent2 f = do
     txt <- Gtk.entryGetText ent1
-    let txt' = show $ ST.calculate $ ST.makeSyntax $ T.unpack txt
+    let txt' = f $ T.unpack txt
     _ <- Gtk.entrySetText ent2 $ T.pack txt'
     set ent1 [#text := ""]
 
@@ -30,11 +32,12 @@ main = do
 
     result <- new Gtk.Entry []
 
-    button <- new Gtk.Button [#label := "calculate"]
-    _ <- on button #clicked (eval entry result (show))
+    derButton <- new Gtk.Button [#label := "derivate"]
+    _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax))
+    _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax))
     
     #add box entry
-    #add box button
+    #add box derButton
     #add box result
 
     #showAll win
