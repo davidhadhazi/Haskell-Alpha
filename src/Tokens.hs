@@ -1,4 +1,4 @@
-module Tokens where
+module Tokens (Token (..), stringToTokens, isInfixR, fillingUp) where
 
 import Number
 import CReal
@@ -49,13 +49,6 @@ isInfixR RAI = True
 isInfixR LOG = True
 isInfixR _ = False
 
-isOperator :: Token -> Bool
-isOperator E = False
-isOperator PI = False
-isOperator (NUM _) = False
-isOperator (PARAM _) = False
-isOperator _ = True
-
 makeEnd :: CReal -> CReal
 makeEnd dl
  | dl < 1   = dl
@@ -82,7 +75,7 @@ dropColumns :: Int -> [Token] -> [Token]
 dropColumns 0 (CL : s) = s
 dropColumns n (OP : s) = dropColumns (n+1) s
 dropColumns n (CL : s) = dropColumns (n-1) s
-dropColumns n (l : s) = dropColumns n s
+dropColumns n (_ : s) = dropColumns n s
 dropColumns _ _ = undefined
 
 stringToTokens :: String -> [Token]

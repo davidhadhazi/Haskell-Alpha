@@ -34,10 +34,13 @@ main = do
 
     derButton <- new Gtk.Button [#label := "derivate"]
     _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax))
+    intButton <- new Gtk.Button [#label := "integrate"]
+    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax))
     _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax))
     
     #add box entry
     #add box derButton
+    #add box intButton
     #add box result
 
     #showAll win

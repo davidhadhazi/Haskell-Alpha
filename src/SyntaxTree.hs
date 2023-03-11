@@ -1,4 +1,4 @@
-module SyntaxTree where
+module SyntaxTree (makeSyntax, calculate, Expression (..)) where
 
 import Tokens
 import Number
@@ -34,7 +34,7 @@ data Expression
 instance Show Expression where
   show (SIMPLE x) = show x
   show (VAR x)    = x : []
-  show (UNIX (t, exp)) = show t ++ "(" ++ show exp ++ ")"
+  show (UNIX (t, expr)) = show t ++ "(" ++ show expr ++ ")"
   show (BINIX (e1, t, e2)) = "(" ++ show e1 ++ " " ++ show t ++ " " ++ show e2 ++ ")"
 
 buildTree :: [LeveledToken] -> Expression
@@ -68,9 +68,9 @@ makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
-calculate (UNIX (MIN, exp)) = negate $ calculate exp
-calculate (UNIX (SIN, exp)) = e where
-  si = reducing (calculate exp) $ Creal $ 2 * pi
+calculate (UNIX (MIN, expr)) = negate $ calculate expr
+calculate (UNIX (SIN, expr)) = e where
+  si = reducing (calculate expr) $ Creal $ 2 * pi
   e | si == 0 = Integer 0
     | si == (Creal     pi / 6) = Frac ( 1, 2)
     | si == (Creal 5 * pi / 6) = Frac ( 1, 2)
@@ -78,8 +78,8 @@ calculate (UNIX (SIN, exp)) = e where
     | si == (Creal 7 * pi / 6) = Frac (-1, 2)
     | si == (Creal 11* pi / 6) = Frac (-1, 2)
     | otherwise = sin si
-calculate (UNIX (COS, exp)) = e where
-  co = reducing (calculate exp) $ 2 * Creal pi
+calculate (UNIX (COS, expr)) = e where
+  co = reducing (calculate expr) $ 2 * Creal pi
   e | co == 0 = Integer 1
     | co == (Creal pi / 3) = Frac (1, 2)
     | co == (Creal pi / 2) = Integer 0
@@ -88,18 +88,18 @@ calculate (UNIX (COS, exp)) = e where
     | co == (Creal 3 * pi / 2) = Integer 0
     | co == (Creal 5 * pi / 3) = Frac (1, 2)
     | otherwise = cos co
-calculate (UNIX (TAN, exp)) = e where
-  ta = reducing (calculate exp) $ Creal pi
+calculate (UNIX (TAN, expr)) = e where
+  ta = reducing (calculate expr) $ Creal pi
   e | ta == (Creal pi / 4) = Integer 1
     | ta == (Creal 3 * pi / 4) = Integer $ -1
     | otherwise = tan ta
-calculate (UNIX (CTG, exp)) = e where
-  ct = reducing (calculate exp) $ Creal pi
+calculate (UNIX (CTG, expr)) = e where
+  ct = reducing (calculate expr) $ Creal pi
   e | ct == 0 = Integer 0
       |otherwise = 1 / tan ct
 calculate (BINIX (exp1, LOG, exp2)) = (/) (log (calculate exp2)) $ log $ calculate exp1
-calculate (UNIX (LOG10, exp)) = (/) (log (calculate exp)) $ log 10
-calculate (UNIX (LN, exp)) = log $ calculate exp
+calculate (UNIX (LOG10, expr)) = (/) (log (calculate expr)) $ log 10
+calculate (UNIX (LN, expr)) = log $ calculate expr
 calculate (BINIX (exp1, ADD, exp2)) =  (+) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MIN, exp2)) =  (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) =  (*) (calculate exp1) (calculate exp2)
@@ -107,5 +107,3 @@ calculate (BINIX (exp1, DIV, exp2)) =  (/) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, RAI, exp2)) = (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
 
-evaluate :: String -> Number'
-evaluate = calculate . makeSyntax

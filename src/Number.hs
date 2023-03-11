@@ -1,8 +1,6 @@
-module Number where
+module Number (Number' (..)) where
 
 import GHC.Real
-import Data.Ratio
-import GHC.Float
 import CReal
 
 data Number'
@@ -11,14 +9,10 @@ data Number'
   | Frac    (Integer, Integer)
   | Undefined
 
-isInteger :: Number' -> Bool
-isInteger (Integer _) = True
-isInteger _ = False
-
 instance Show Number' where
   show (Integer           i) = show i
-  show (Creal             c) = if c == floor c then show (floor c) else show c
-  show (Frac     (num, dom)) = show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  "++ show (fromInteger num / fromInteger dom))
+  show (Creal             c) = show c
+  show (Frac     (num, dom)) = show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  " ++ show (Creal ((fromIntegral num) / (fromIntegral dom))))
   show Undefined             = show "Undefinied"
 
 instance Eq Number' where
@@ -34,13 +28,13 @@ instance Eq Number' where
 instance Ord Number' where
   compare (Integer i1) (Integer i2) = compare i1 i2
   compare (Integer i ) (Creal   f ) = compare (fromInteger i) f
-  compare (Integer i ) (Frac (n,d)) = compare (fromInteger i) (fromInteger n / fromInteger d)
+  compare (Integer i ) (Frac (n,d)) = compare (i * d) n
   compare (Creal   c ) (Integer i ) = compare c $ fromInteger i
   compare (Creal   c1) (Creal   c2) = compare c1 c2
   compare (Creal   c ) (Frac (n,d)) = compare c $ fromInteger n / fromInteger d
-  compare (Frac (n,d)) (Integer i ) = compare (fromInteger n / fromInteger d) (fromInteger i)
+  compare (Frac (n,d)) (Integer i ) = compare n (i * d)
   compare (Frac (n,d)) (Creal   c ) = compare (fromInteger n / fromInteger d) c
-  compare (Frac (n1,d1)) (Frac (n2,d2)) = compare (fromInteger n1 / fromInteger d1) (fromInteger n2 / fromInteger d2)
+  compare (Frac (n1,d1)) (Frac (n2,d2)) = compare (n1 * d2) (n2 * d1)
   compare _ _ = undefined
 
 instance Num Number' where
@@ -82,7 +76,7 @@ instance Fractional Number' where
 
   (/) (Integer i1) (Integer i2) = Frac (numerator (i1 % i2), denominator (i1 % i2))
   (/) (Integer i) (Creal  f) = Creal $ fromInteger i / f
-  (/) (Integer i) (Frac (n,d)) = Frac (d, n)
+  (/) (Integer i) (Frac (n,d)) = Frac (i * d, n)
   (/) (Creal c) (Integer i) = Creal $ c / fromInteger i
   (/) (Creal c1) (Creal c2) = Creal $ c1 / c2
   (/) (Creal c) (Frac (n,d)) = if fromIntegral (round c * d) == c * fromInteger d then Frac (round c * d, n) else Creal $ c / fromInteger n * fromInteger d

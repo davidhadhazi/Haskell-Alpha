@@ -26,7 +26,6 @@ library
   exposed-modules:
       CReal
       Derivate
-      Lib
       Number
       Simplification
       SyntaxTree
