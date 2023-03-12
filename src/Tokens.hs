@@ -17,6 +17,7 @@ data Token
  | COS
  | TAN
  | CTG
+ | NEG
  | OP
  | CL
  | DOT
@@ -40,14 +41,26 @@ instance Show Token where
     show COS = "cos"
     show TAN = "tan"
     show CTG = "ctg"
+    show NEG = "-"
     show E = "e"
     show PI = "pi"
+    show (NUM n) = show n
     show _ = undefined
 
 isInfixR :: Token -> Bool
 isInfixR RAI = True
 isInfixR LOG = True
+isInfixR NEG = True
 isInfixR _ = False
+
+isOperator :: Token -> Bool
+isOperator (PURE _) = False
+isOperator (NUM _) = False
+isOperator (PARAM _) = False
+isOperator E = False
+isOperator PI = False
+isOperator CL = False
+isOperator _ = True
 
 makeEnd :: CReal -> CReal
 makeEnd dl
@@ -62,6 +75,9 @@ fillingUp ((PURE n1):DOT:(PURE n2):ts) = NUM (Creal (fromIntegral n1 + makeEnd (
 fillingUp ((PURE n):ts) = NUM (Integer (toInteger n)) : fillingUp ts
 fillingUp (LOG :(PURE n):ts) = NUM (Integer (toInteger n)) : LOG : fillingUp ts
 fillingUp (LOG : OP : ts) = [OP] ++ fillingUp (takeColumns 0 ts) ++ [CL] ++ [LOG] ++ fillingUp (dropColumns 0 ts)
+fillingUp (t : MIN : ts)
+ | isOperator t = fillingUp $ t : NEG : ts
+ |otherwise = t : (fillingUp $ MIN : ts) 
 fillingUp (t:ts) = t : fillingUp ts
 
 takeColumns :: Int -> [Token] -> [Token]

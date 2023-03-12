@@ -38,7 +38,6 @@ instance Show Expression where
   show (BINIX (e1, t, e2)) = "(" ++ show e1 ++ " " ++ show t ++ " " ++ show e2 ++ ")"
 
 buildTree :: [LeveledToken] -> Expression
-buildTree [] = undefined
 -- One attributed tokens
 buildTree [LeveledToken (NUM   x, _)] = SIMPLE x
 buildTree [LeveledToken (PARAM x, _)] = VAR x
@@ -57,6 +56,7 @@ buildTree tokens = l where
   right = map snd $ drop lowestPos list
   -- Recognizing unix operands
   l
+   | fst' lowest == MIN && null left = UNIX (NEG, buildTree right)
    | null left = UNIX (fst' lowest, buildTree right)
    | otherwise = BINIX (buildTree left, fst' lowest, buildTree right)
 
@@ -68,7 +68,7 @@ makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
-calculate (UNIX (MIN, expr)) = negate $ calculate expr
+calculate (UNIX (NEG, expr)) = negate $ calculate expr
 calculate (UNIX (SIN, expr)) = e where
   si = reducing (calculate expr) $ Creal $ 2 * pi
   e | si == 0 = Integer 0

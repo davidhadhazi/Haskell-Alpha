@@ -11,7 +11,7 @@ data Number'
 
 instance Show Number' where
   show (Integer           i) = show i
-  show (Creal             c) = show c
+  show (Creal             c) = if round c == c then init (init (show c)) else show c 
   show (Frac     (num, dom)) = show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  " ++ show (Creal ((fromIntegral num) / (fromIntegral dom))))
   show Undefined             = show "Undefinied"
 
