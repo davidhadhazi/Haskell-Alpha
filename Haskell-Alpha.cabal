@@ -59,7 +59,7 @@ executable Haskell-Alpha-exe
 
 test-suite Haskell-Alpha-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Main.hs
   other-modules:
       TestCases
       Paths_Haskell_Alpha
@@ -67,7 +67,8 @@ test-suite Haskell-Alpha-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      Haskell-Alpha
+      HUnit
+    , Haskell-Alpha
     , base >=4.7 && <5
     , gi-gtk
     , haskell-gi-base

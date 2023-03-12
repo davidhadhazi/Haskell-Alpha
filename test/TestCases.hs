@@ -1,10 +1,9 @@
-module TestCases where
+module TestCases ( tests ) where
 
 import Test.HUnit
-import Lib.Tokens
-import Lib.SyntaxTree
-import GHC.Arr
-import Lib.Number
+import Tokens
+import SyntaxTree
+import Number
 
 tokentest0 :: Test
 tokentest0 = TestCase (assertEqual "tokenNumber0" (stringToTokens "") [])
@@ -29,7 +28,7 @@ tokens = TestList[
 syntaxtest1 :: Test
 syntaxtest1 = TestCase (assertEqual "syntax1+1" (calculate (makeSyntax "1+1")) (Integer 2))
 syntaxtest2 :: Test
-syntaxtest2 = TestCase (assertEqual "syntax1/2" (calculate (makeSyntax "1/2")) (Frac (1, 3)))
+syntaxtest2 = TestCase (assertEqual "syntax1/2" (calculate (makeSyntax "1/2")) (Frac (1, 2)))
 
 syntaxes :: Test
 syntaxes = TestList [
