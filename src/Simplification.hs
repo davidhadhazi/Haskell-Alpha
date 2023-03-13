@@ -25,7 +25,7 @@ reduce (BINIX (e1, t, e2))
  | calculateable e1 && calculateable e2 = SIMPLE $ calculate $ BINIX (e1, t, e2)
  | calculateable e1 = BINIX ((SIMPLE (calculate e1)), t, (reduce e2))
  | calculateable e2 = BINIX ((reduce e1), t, (SIMPLE (calculate e2)))
- | otherwise = reduce $ BINIX ((reduce e1), t, (reduce e2))
+ | otherwise = BINIX ((reduce e1), t, (reduce e2))
 
 unbracketing :: Expression -> Expression
 unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e       --      - - a = a
@@ -70,5 +70,20 @@ unbracketing (UNIX (t, e)) = UNIX (t, unbracketing e)
 unbracketing (SIMPLE n) = SIMPLE n
 unbracketing (VAR    x) = VAR    x
 
+ordering :: Expression -> Expression
+ordering (BINIX ((UNIX (t, e1)), ADD, e2)) = BINIX (ordering e2, ADD, UNIX (t, ordering e1))
+ordering (BINIX ((SIMPLE n), ADD, e)) = BINIX ((SIMPLE n), ADD, ordering e)
+ordering (BINIX (e, ADD, (SIMPLE n))) = BINIX ((SIMPLE n), ADD, ordering e)
+ordering (BINIX ((VAR x), ADD, e)) = BINIX ((VAR x), ADD, ordering e)
+ordering (BINIX (e, ADD, (VAR x))) = BINIX ((VAR x), ADD, ordering e)
+-----------------------------------------------------
+ordering (BINIX ((SIMPLE n), MUL, e)) = BINIX ((SIMPLE n), MUL, ordering e)
+ordering (BINIX (e, MUL, (SIMPLE n))) = BINIX ((SIMPLE n), MUL, ordering e)
+-----------------------------------------------------
+ordering (BINIX (e1, t, e2)) = BINIX (ordering e1, t, ordering e2)
+ordering (UNIX (t, e)) = UNIX (t, ordering e)
+ordering (SIMPLE n) = SIMPLE n
+ordering (VAR x) = VAR x
+
 simplifying :: Expression -> Expression
-simplifying e = if e == (reduce (unbracketing e)) then e else simplifying $ reduce $ unbracketing e
+simplifying e = if e == ordering (reduce (unbracketing e)) then e else simplifying $ ordering $ reduce $ unbracketing e
