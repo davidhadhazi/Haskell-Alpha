@@ -2,6 +2,7 @@ module Simplification (simplifying) where
 
 import SyntaxTree
 import Tokens
+import Ordering
 
 calculateable :: Expression -> Bool
 calculateable (VAR _) = False
@@ -76,37 +77,5 @@ rebracketing (BINIX (BINIX (e1, ADD, e2), ADD, e3)) = rebracketing (BINIX (e1, A
 rebracketing (BINIX (e1, ADD, BINIX (e2, ADD, e3))) = BINIX (e1, ADD, rebracketing (BINIX (e2, ADD, e3)))
 rebracketing e = e
 
-ordering :: Expression -> Expression
-ordering (BINIX ((SIMPLE n), ADD, e)) = BINIX ((SIMPLE n), ADD, ordering e)
-ordering (BINIX (e1, ADD, BINIX (SIMPLE n, ADD, e2))) = BINIX (SIMPLE n, ADD, ordering (BINIX (e1, ADD, e2)))
-ordering (BINIX (e, ADD, (SIMPLE n))) = BINIX ((SIMPLE n), ADD, ordering e)
-ordering (BINIX ((VAR x), ADD, e)) = BINIX ((VAR x), ADD, ordering e)
-ordering (BINIX (e1, ADD, BINIX (VAR x, ADD, e2))) = BINIX (VAR x, ADD, ordering (BINIX (e1, ADD, e2)))
-ordering (BINIX (e, ADD, (VAR x))) = BINIX ((VAR x), ADD, ordering e)
-ordering (BINIX (BINIX (e1, RAI, SIMPLE n), ADD, BINIX (e2, RAI, SIMPLE m)))
- | n > m = BINIX (BINIX (ordering e2, RAI, SIMPLE m), ADD, BINIX (ordering e1, RAI, SIMPLE n))
- |otherwise = BINIX (BINIX (e1, RAI, SIMPLE n), ADD, BINIX (e2, RAI, SIMPLE m))
-ordering (BINIX (BINIX (e1, RAI, SIMPLE n), ADD, BINIX (BINIX (e2, RAI, SIMPLE m), ADD, e3)))
- | n > m = BINIX (BINIX (ordering e2, RAI, SIMPLE m), ADD, ordering (BINIX (BINIX (e1, RAI, SIMPLE n), ADD, e3)))
- |otherwise = BINIX (BINIX (ordering e1, RAI, SIMPLE n), ADD, ordering (BINIX (BINIX (e2, RAI, SIMPLE m), ADD, e3)))
-ordering (BINIX (e1, ADD, BINIX (BINIX (e2, RAI, SIMPLE n), ADD, e3))) = BINIX (BINIX (ordering e2, RAI, SIMPLE n), ADD, BINIX (e1, ADD, e3))
-ordering (BINIX (BINIX (e1, RAI, SIMPLE n), ADD, e2)) = BINIX (BINIX (ordering e1, RAI, SIMPLE n), ADD, ordering e2)
-ordering (BINIX (e1, ADD, BINIX (e2, RAI, SIMPLE n))) = BINIX (BINIX (ordering e2, RAI, SIMPLE n), ADD, ordering e1)
-ordering (BINIX (UNIX (t1, e1), ADD, UNIX (t2, e2)))
- | t1 > t2 = BINIX (UNIX (t2, ordering e2), ADD, UNIX (t1, ordering e1))
- |otherwise = BINIX (UNIX (t1, ordering e1), ADD, UNIX (t2, ordering e2))
-ordering (BINIX (UNIX (t1, e1), ADD, BINIX (UNIX (t2, e2), ADD, e3)))
- | t1 > t2 = BINIX (UNIX (t2, ordering e2), ADD, ordering (BINIX (UNIX (t1, e1), ADD, e3)))
- |otherwise = BINIX (UNIX (t1, ordering e1), ADD, ordering (BINIX (UNIX (t2, e2), ADD, e3)))
-ordering (BINIX ((UNIX (t, e1)), ADD, e2)) = BINIX (ordering e2, ADD, UNIX (t, ordering e1))
------------------------------------------------------
-ordering (BINIX ((SIMPLE n), MUL, e)) = BINIX ((SIMPLE n), MUL, ordering e)
-ordering (BINIX (e, MUL, (SIMPLE n))) = BINIX ((SIMPLE n), MUL, ordering e)
------------------------------------------------------
-ordering (BINIX (e1, t, e2)) = BINIX (ordering e1, t, ordering e2)
-ordering (UNIX (t, e)) = UNIX (t, ordering e)
-ordering (SIMPLE n) = SIMPLE n
-ordering (VAR x) = VAR x
-
 simplifying :: Expression -> Expression
-simplifying e = if e == reduce (ordering (rebracketing (unbracketing e))) then e else simplifying $ reduce $ ordering $ rebracketing $ unbracketing e
+simplifying e = if e == reduce (ordering (rebracketing (unbracketing e))) then e else rebracketing $ simplifying $ reduce $ ordering $ rebracketing $ unbracketing e
