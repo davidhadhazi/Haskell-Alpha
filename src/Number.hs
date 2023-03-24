@@ -15,9 +15,9 @@ instance Show Number' where
 
 round' :: Number' -> Number'
 round' (Creal c) = if round c == c then Integer (round c) else (Creal c)
-round' (Integer i) = Integer i
-round' (Frac (n,d)) = Frac (n,d)
--- round' e = e
+-- round' (Integer i) = Integer i
+-- round' (Frac (n,d)) = Frac (n,d)
+round' e = e
 
 instance Eq Number' where
   (==) (Integer   i1) (Integer   i2) = i1 == i2

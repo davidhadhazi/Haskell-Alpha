@@ -2,6 +2,7 @@ module SyntaxTree (makeSyntax, calculate, Expression (..)) where
 
 import Tokens
 import Number
+import Text.Parsec.Expr
 
 newtype LeveledToken = LeveledToken (Token, Int)
  deriving (Eq)

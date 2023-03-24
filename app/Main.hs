@@ -14,8 +14,8 @@ eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) ->IO ()
 eval ent1 ent2 f = do
     txt <- Gtk.entryGetText ent1
     let txt' = f $ T.unpack txt
-    _ <- Gtk.entrySetText ent2 $ T.pack txt'
-    set ent1 [#text := ""]
+    Gtk.entrySetText ent2 $ T.pack txt'
+    -- set ent1 [#text := ""]
 
 main :: IO()
 main = do
