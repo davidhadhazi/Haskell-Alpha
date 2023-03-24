@@ -71,7 +71,7 @@ calculate (SIMPLE x)       = x
 calculate (UNIX (NEG, expr)) = negate $ calculate expr
 calculate (UNIX (SIN, expr)) = e where
   si = reducing (calculate expr) $ Creal $ 2 * pi
-  e | si == 0 = Integer 0
+  e | si == Creal 0 = Integer 0
     | si == (Creal     pi / 6) = Frac ( 1, 2)
     | si == (Creal 5 * pi / 6) = Frac ( 1, 2)
     | si == Creal      pi      = Integer 0
@@ -80,7 +80,7 @@ calculate (UNIX (SIN, expr)) = e where
     | otherwise = sin si
 calculate (UNIX (COS, expr)) = e where
   co = reducing (calculate expr) $ 2 * Creal pi
-  e | co == 0 = Integer 1
+  e | co == Creal 0 = Integer 1
     | co == (Creal pi / 3) = Frac (1, 2)
     | co == (Creal pi / 2) = Integer 0
     | co == (Creal 2 * pi / 3) = Frac (-1, 2)
@@ -97,13 +97,13 @@ calculate (UNIX (CTG, expr)) = e where
   ct = reducing (calculate expr) $ Creal pi
   e | ct == 0 = Integer 0
       |otherwise = 1 / tan ct
-calculate (BINIX (exp1, LOG, exp2)) = (/) (log (calculate exp2)) $ log $ calculate exp1
-calculate (UNIX (LOG10, expr)) = (/) (log (calculate expr)) $ log 10
-calculate (UNIX (LN, expr)) = log $ calculate expr
-calculate (BINIX (exp1, ADD, exp2)) =  (+) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, MIN, exp2)) =  (-) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, MUL, exp2)) =  (*) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, DIV, exp2)) =  (/) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, RAI, exp2)) = (**) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, LOG, exp2)) = round' $ (/) (log (calculate exp2)) $ log $ calculate exp1
+calculate (UNIX (LOG10, expr)) = round' $ (/) (log (calculate expr)) $ log 10
+calculate (UNIX (LN, expr)) = round' $ log $ calculate expr
+calculate (BINIX (exp1, ADD, exp2)) = round' $  (+) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MIN, exp2)) = round' $  (-) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, MUL, exp2)) = round' $  (*) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, DIV, exp2)) = round' $  (/) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, RAI, exp2)) = round' $ (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
 

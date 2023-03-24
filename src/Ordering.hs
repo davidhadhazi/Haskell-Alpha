@@ -56,7 +56,7 @@ orderingSum (BINIX (UNIX (t1, e1), ADD, BINIX (UNIX (t2, e2), ADD, e3)))
  | t1 > t2 = BINIX (UNIX (t2, ordering e2), ADD, ordering (BINIX (UNIX (t1, e1), ADD, e3)))
  |otherwise = BINIX (UNIX (t1, ordering e1), ADD, ordering (BINIX (UNIX (t2, e2), ADD, e3)))
 orderingSum (BINIX ((UNIX (t, e1)), ADD, e2)) = BINIX (ordering e2, ADD, UNIX (t, ordering e1))
-orderingSum id = id
+orderingSum e = e
 
 orderingMul (BINIX ((SIMPLE n), MUL, e)) = BINIX ((SIMPLE n), MUL, ordering e)
 orderingMul (BINIX (e1, MUL, BINIX (SIMPLE n, MUL, e2))) = BINIX (SIMPLE n, MUL, ordering (BINIX (e1, MUL, e2)))
@@ -80,3 +80,4 @@ orderingMul (BINIX (UNIX (t1, e1), MUL, BINIX (UNIX (t2, e2), MUL, e3)))
  | t1 > t2 = BINIX (UNIX (t2, ordering e2), MUL, ordering (BINIX (UNIX (t1, e1), MUL, e3)))
  |otherwise = BINIX (UNIX (t1, ordering e1), MUL, ordering (BINIX (UNIX (t2, e2), MUL, e3)))
 orderingMul (BINIX ((UNIX (t, e1)), MUL, e2)) = BINIX (ordering e2, MUL, UNIX (t, ordering e1))
+orderingMul e = e

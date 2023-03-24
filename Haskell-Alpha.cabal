@@ -27,6 +27,7 @@ library
       CReal
       Derivate
       Number
+      Ordering
       Simplification
       SyntaxTree
       Tokens
