@@ -11,7 +11,10 @@ data Number'
 instance Show Number' where
   show (Integer           i) = show i
   show (Creal             c) = if round c == c then init (init (show c)) else show c 
-  show (Frac     (num, dom)) = show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  " ++ show (Creal ((fromIntegral num) / (fromIntegral dom))))
+  show (Frac     (num, dom)) = 
+    -- show (numerator (num % dom)) ++ (if 1 == denominator (num % dom) then "" else "/" ++ show (denominator (num % dom)) ++ "  " ++ 
+    show (Creal ((fromIntegral num) / (fromIntegral dom)))
+    -- )
 
 round' :: Number' -> Number'
 round' (Creal c) = if round c == c then Integer (round c) else (Creal c)

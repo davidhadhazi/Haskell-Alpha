@@ -2,7 +2,6 @@ module SyntaxTree (makeSyntax, calculate, Expression (..)) where
 
 import Tokens
 import Number
-import Text.Parsec.Expr
 
 newtype LeveledToken = LeveledToken (Token, Int)
  deriving (Eq)
@@ -30,7 +29,16 @@ data Expression
   | VAR    Char
   | UNIX   (Token, Expression)
   | BINIX  (Expression, Token, Expression)
- deriving (Eq)
+
+instance Eq Expression where
+  (==) (SIMPLE n) (SIMPLE m) = n == m
+  (==) (SIMPLE _) _ = False
+  (==) (VAR x) (VAR y) = x == y
+  (==) (VAR _) _ = False
+  (==) (UNIX (t1, e1)) (UNIX (t2, e2)) = t1 == t2 && e1 == e2
+  (==) (UNIX _) _ = False
+  (==) (BINIX (a1, t1, b1)) (BINIX (a2, t2, b2)) = t1 == t2 && a1 == a2 && b1 == b2
+  (==) (BINIX _) _ = False
 
 instance Show Expression where
   show (SIMPLE x) = show x

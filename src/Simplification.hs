@@ -3,6 +3,7 @@ module Simplification (simplifying) where
 import SyntaxTree
 import Tokens
 import Ordering
+import Summation
 
 calculateable :: Expression -> Bool
 calculateable (VAR _) = False
@@ -78,4 +79,5 @@ rebracketing (BINIX (e1, ADD, BINIX (e2, ADD, e3))) = BINIX (e1, ADD, rebracketi
 rebracketing e = e
 
 simplifying :: Expression -> Expression
-simplifying e = if e == reduce (ordering (rebracketing (unbracketing e))) then e else rebracketing $ simplifying $ reduce $ ordering $ rebracketing $ unbracketing e
+simplifying e = if e == summation (reduce (ordering (rebracketing (unbracketing e))))
+     then e else simplifying $ summation $ reduce $ ordering $ rebracketing $ unbracketing e
