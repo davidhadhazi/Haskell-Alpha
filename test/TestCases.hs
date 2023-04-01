@@ -4,6 +4,7 @@ import Test.HUnit
 import Tokens
 import SyntaxTree
 import Number
+import Simplification
 
 tokentest0 :: Test
 tokentest0 = TestCase (assertEqual "tokenNumber0" (stringToTokens "") [])
@@ -115,9 +116,41 @@ calculations = TestList [
                      TestLabel "calculation11" calculationtest13
                      ]
 
+simplifyingtest0 :: Test
+simplifyingtest0 = TestCase (assertEqual "simplifying0" (simplifying (makeSyntax "x")) (VAR 'x'))
+simplifyingtest0' :: Test
+simplifyingtest0' = TestCase (assertEqual "simplifying0'" (simplifying (makeSyntax "1")) (SIMPLE 1))
+simplifyingtest1 :: Test
+simplifyingtest1 = TestCase (assertEqual "simplifying1" (simplifying (makeSyntax "2 + x")) (BINIX (SIMPLE 2, ADD, VAR 'x')))
+simplifyingtest1' :: Test
+simplifyingtest1' = TestCase (assertEqual "simplifying1'" (simplifying (makeSyntax "x + 2")) (BINIX (SIMPLE 2, ADD, VAR 'x')))
+simplifyingtest2 :: Test
+simplifyingtest2 = TestCase (assertEqual "simplifying2" (simplifying (makeSyntax "6x^2 + x + 2x^7")) (BINIX (VAR 'x', ADD, 
+    BINIX (BINIX (SIMPLE 6, MUL, BINIX (VAR 'x', RAI, SIMPLE 2)), ADD, BINIX (SIMPLE 2, MUL, BINIX (VAR 'x', RAI, SIMPLE 7))))))
+simplifyingtest2' :: Test
+simplifyingtest2' = TestCase (assertEqual "simplifying2'" (simplifying (makeSyntax "2 + 3x + 9x^2")) (BINIX (SIMPLE 2, ADD, BINIX (BINIX (SIMPLE 3, MUL, VAR 'x'), ADD,
+    BINIX (SIMPLE 9, MUL, BINIX (VAR 'x', RAI, SIMPLE 2))))))
+simplifyingtest3 :: Test
+simplifyingtest3 = TestCase (assertEqual "simplifying3" (simplifying (makeSyntax "sin x + 2")) (BINIX (SIMPLE 2, ADD, UNIX (SIN, VAR 'x'))))
+simplifyingtest3' :: Test
+simplifyingtest3' = TestCase (assertEqual "simplifying3'" (simplifying (makeSyntax "2 + sin x")) (BINIX (SIMPLE 2, ADD, UNIX (SIN, VAR 'x'))))
+
+simplifyings :: Test
+simplifyings = TestList [
+                    TestLabel "simplifying0" simplifyingtest0,
+                    TestLabel "simplifying0'" simplifyingtest0',
+                    TestLabel "simplifying1" simplifyingtest1,
+                    TestLabel "simplifying1'" simplifyingtest1',
+                    TestLabel "simplifying2" simplifyingtest2,
+                    TestLabel "simplifying2'" simplifyingtest2',
+                    TestLabel "simplifying3" simplifyingtest3,
+                    TestLabel "simplifying3'" simplifyingtest3'
+                ]
+
 tests :: Test
 tests = TestList [
                     TestLabel "tokens" tokens,
                     TestLabel "syntaxes" syntaxes,
-                    TestLabel "calculations" calculations
+                    TestLabel "calculations" calculations,
+                    TestLabel "simplifyings" simplifyings
                     ]

@@ -21,6 +21,8 @@ summationSum (SIMPLE n) = SIMPLE n
 
 summationProd (BINIX (SIMPLE n, MUL, BINIX (SIMPLE m, MUL, e))) = summation $ BINIX (SIMPLE (n * m), MUL, e)        -- n * (m * e) = (n * m) * e
 summationProd (BINIX (VAR x, MUL, VAR y)) = BINIX (VAR x, RAI, SIMPLE 2)        -- x * x = x ^ 2
+summationProd (BINIX (VAR x, MUL, BINIX (VAR y, RAI, SIMPLE n))) = BINIX (VAR x, RAI, SIMPLE (n + 1))       -- x * x ^ n = x ^ (n + 1)
+summationProd (BINIX (BINIX (VAR x, RAI, SIMPLE n), MUL, BINIX (VAR y, RAI, SIMPLE m))) = BINIX (VAR x, RAI, SIMPLE (n + m))        -- x ^ n * x ^ x ^ m = x ^ (n + m)
 summationProd (BINIX (VAR x, MUL, BINIX (VAR y, MUL, e))) = summation $ BINIX (BINIX (VAR x, RAI, SIMPLE 2), MUL, e)        -- x * (x * e) = x ^ 2 * e
 summationProd (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
 summationProd (UNIX (t, e)) = UNIX (t, summation e)
