@@ -5,6 +5,7 @@ import Tokens
 import SyntaxTree
 import Number
 import Simplification
+import Derivate
 
 tokentest0 :: Test
 tokentest0 = TestCase (assertEqual "tokenNumber0" (stringToTokens "") [])
@@ -147,10 +148,26 @@ simplifyings = TestList [
                     TestLabel "simplifying3'" simplifyingtest3'
                 ]
 
+derivates :: Test
+derivates = TestList [
+                    TestLabel "derivate0" (TestCase (assertEqual "derivate0" (simplifying (derivate (makeSyntax "0"))) (SIMPLE 0))),
+                    TestLabel "derivate1" (TestCase (assertEqual "derivate1" (simplifying (derivate (makeSyntax "x"))) (SIMPLE 1))),
+                    TestLabel "derivate1'" (TestCase (assertEqual "derivate1'" (simplifying (derivate (makeSyntax "16x"))) (SIMPLE 16))),
+                    TestLabel "derivate2" (TestCase (assertEqual "derivate2" (simplifying (derivate (makeSyntax "x^2"))) (BINIX (SIMPLE 2, MUL, VAR 'x')))),
+                    TestLabel "derivate3" (TestCase (assertEqual "derivate3" (simplifying (derivate (makeSyntax "(x+1)^2"))) (BINIX (SIMPLE 2, ADD, BINIX (SIMPLE 2, MUL, VAR 'x'))))),
+                    TestLabel "derivate4" (TestCase (assertEqual "derivate4" (simplifying (derivate (makeSyntax "(x+1)^7"))) (BINIX (SIMPLE 7, MUL, BINIX (BINIX (SIMPLE 1, ADD, VAR 'x'), RAI, SIMPLE 6))))),
+                    TestLabel "derivate5" (TestCase (assertEqual "derivate5" (simplifying (derivate (makeSyntax "sin x"))) (UNIX (COS, VAR 'x')))),
+                    TestLabel "derivate6" (TestCase (assertEqual "derivate6" (simplifying (derivate (makeSyntax "cos x"))) (UNIX (NEG, UNIX (SIN, VAR 'x'))))),
+                    TestLabel "derivate7" (TestCase (assertEqual "derivate7" (simplifying (derivate (makeSyntax "sin x + 1"))) (UNIX (COS, VAR 'x')))),
+                    TestLabel "derivate8" (TestCase (assertEqual "derivate8" (simplifying (derivate (makeSyntax "tan x"))) (BINIX (SIMPLE 1, DIV, BINIX (UNIX (COS, VAR 'x'), RAI, SIMPLE 2))))),
+                    TestLabel "derivate9" (TestCase (assertEqual "derivate9" (simplifying (derivate (makeSyntax "ctg x"))) (BINIX (SIMPLE 1, DIV, BINIX (UNIX (SIN, VAR 'x'), RAI, SIMPLE 2)))))
+                    ]
+
 tests :: Test
 tests = TestList [
                     TestLabel "tokens" tokens,
                     TestLabel "syntaxes" syntaxes,
                     TestLabel "calculations" calculations,
-                    TestLabel "simplifyings" simplifyings
+                    TestLabel "simplifyings" simplifyings,
+                    TestLabel "derivates" derivates
                     ]

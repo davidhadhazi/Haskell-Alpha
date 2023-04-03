@@ -23,6 +23,9 @@ reduce (BINIX (_, MUL, (SIMPLE 0))) = SIMPLE 0
 reduce (BINIX ((SIMPLE 0), MUL, _)) = SIMPLE 0
 reduce (BINIX ((SIMPLE n), MUL, BINIX ((SIMPLE m), DIV, e))) = BINIX ((SIMPLE (n * m)), DIV, e)
 reduce (BINIX ((BINIX ((SIMPLE m), DIV, e)), MUL, (SIMPLE n))) = BINIX ((SIMPLE (n * m)), DIV, e)
+reduce (BINIX (e, RAI, SIMPLE 1)) = e
+reduce (BINIX (SIMPLE 0, RAI, SIMPLE 0)) = undefined
+reduce (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
 reduce (BINIX (e1, t, e2))
  | calculateable e1 && calculateable e2 = SIMPLE $ calculate $ BINIX (e1, t, e2)
  | calculateable e1 = BINIX ((SIMPLE (calculate e1)), t, (reduce e2))
@@ -30,6 +33,7 @@ reduce (BINIX (e1, t, e2))
  | otherwise = BINIX ((reduce e1), t, (reduce e2))
 
 unbracketing :: Expression -> Expression
+unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE n, MUL, e2))
 unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e       --      - - a = a
 unbracketing (UNIX (NEG, (BINIX (e1, MIN, e2)))) = BINIX (unbracketing e2, MIN, unbracketing e1)        --      -(a - b) = b - a
 unbracketing (BINIX (e1, ADD, (UNIX (NEG, e2)))) = BINIX (unbracketing e1, MIN, unbracketing e2)        --      (a + -b) = a - b
