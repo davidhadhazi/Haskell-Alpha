@@ -7,30 +7,29 @@ import Number
 import Simplification
 import Derivate
 
-tokentest0 :: Test
-tokentest0 = TestCase (assertEqual "tokenNumber0" (stringToTokens "") [])
-tokentest1 :: Test
-tokentest1 = TestCase (assertEqual "tokenNumber1" (stringToTokens "1 1") [PURE 1, PURE 1])
-tokentest2 :: Test
-tokentest2 = TestCase (assertEqual "tokenNumber2" (stringToTokens "1                1") [PURE 1, PURE 1])
-tokentest3 :: Test
-tokentest3 = TestCase (assertEqual "tokenNumber3" (stringToTokens "123") [PURE 123])
-tokentest4 :: Test
-tokentest4 = TestCase (assertEqual "tokenNumber4" (fillingUp (stringToTokens "1.2")) [NUM 1.2])
-tokentest5 :: Test
-tokentest5 = TestCase (assertEqual "tokenNumber5" (fillingUp (stringToTokens "pi")) [PI])
-tokentest6 :: Test
-tokentest6 = TestCase (assertEqual "tokenNumber6" (fillingUp (stringToTokens "e")) [E])
-
 tokens :: Test
 tokens = TestList[
-                  TestLabel "token0" tokentest0,
-                  TestLabel "token1" tokentest1,
-                  TestLabel "token2" tokentest2, 
-                  TestLabel "token3" tokentest3,
-                  TestLabel "token4" tokentest4,
-                  TestLabel "token5" tokentest5,
-                  TestLabel "token6" tokentest6
+                  TestLabel "token0" (TestCase (assertEqual "empty" (stringToTokens "") [])),
+                  TestLabel "token1" (TestCase (assertEqual "1 1" (stringToTokens "1 1") [PURE 1, PURE 1])),
+                  TestLabel "token2" (TestCase (assertEqual "1              1 = 1 1" (stringToTokens "1                1") [PURE 1, PURE 1])), 
+                  TestLabel "token3" (TestCase (assertEqual "123" (stringToTokens "123") [PURE 123])),
+                  TestLabel "token4" (TestCase (assertEqual "1.2" (stringToTokens "1.2") [PURE 1, DOT, PURE 2])),
+                  TestLabel "token5" (TestCase (assertEqual "pi" (stringToTokens "pi") [PI])),
+                  TestLabel "token6" (TestCase (assertEqual "e" (stringToTokens "e") [E])),
+                  TestLabel "token7" (TestCase (assertEqual "+" (stringToTokens "+") [ADD])),
+                  TestLabel "token8" (TestCase (assertEqual "-" (stringToTokens "-") [MIN])),
+                  TestLabel "token9" (TestCase (assertEqual "*" (stringToTokens "*") [MUL])),
+                  TestLabel "token10" (TestCase (assertEqual "/" (stringToTokens "/") [DIV])),
+                  TestLabel "token11" (TestCase (assertEqual "^" (stringToTokens "^") [RAI])),
+                  TestLabel "token12" (TestCase (assertEqual "log" (stringToTokens "log_") [LOG])),
+                  TestLabel "token13" (TestCase (assertEqual "log_" (stringToTokens "log") [LOG10])),
+                  TestLabel "token14" (TestCase (assertEqual "ln" (stringToTokens "ln") [LN])),
+                  TestLabel "token15" (TestCase (assertEqual "sin" (stringToTokens "sin") [SIN])),
+                  TestLabel "token16" (TestCase (assertEqual "cos" (stringToTokens "cos") [COS])),
+                  TestLabel "token17" (TestCase (assertEqual "tan" (stringToTokens "tan") [TAN])),
+                  TestLabel "token18" (TestCase (assertEqual "ctg" (stringToTokens "ctg") [CTG])),
+                  TestLabel "token19" (TestCase (assertEqual "(" (stringToTokens "(") [OP])),
+                  TestLabel "token20" (TestCase (assertEqual ")" (stringToTokens ")") [CL]))
                   ]
 
 syntaxtest0 :: Test
