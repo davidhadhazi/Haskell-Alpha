@@ -44,7 +44,7 @@ instance Num Number' where
   (+) (Integer   i ) (Creal     f ) = Creal   (fromInteger i + f)
   (+) (Integer   i ) (Frac   (n,d)) = Frac    (i * d + n, d)
   (+) (Creal     f1) (Creal     f2) = Creal   (f1 + f2)
-  (+) (Creal     f ) (Frac   (n,d)) = Creal f + Integer n / Integer d
+  (+) (Creal     f ) (Frac   (n,d)) = Creal f + Creal (fromInteger n / fromInteger d)
   (+) (Frac (n1,d1)) (Frac (n2,d2)) = Frac (numerator ((n1 * d2 + n2 * d1) % (d1 * d2)), denominator ((n1 * d2 + n2 * d1) % (d1 * d2)))
   (+) n1 n2 = n2 + n1
 

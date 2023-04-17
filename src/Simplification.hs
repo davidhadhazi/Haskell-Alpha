@@ -21,11 +21,15 @@ reduce (BINIX (e, MUL, (SIMPLE 1))) = e
 reduce (BINIX ((SIMPLE 1), MUL, e)) = e
 reduce (BINIX (_, MUL, (SIMPLE 0))) = SIMPLE 0
 reduce (BINIX ((SIMPLE 0), MUL, _)) = SIMPLE 0
+reduce (BINIX (SIMPLE 0, DIV, SIMPLE 0)) = undefined
+reduce (BINIX (SIMPLE 0, DIV, _)) = SIMPLE 0
 reduce (BINIX ((SIMPLE n), MUL, BINIX ((SIMPLE m), DIV, e))) = BINIX ((SIMPLE (n * m)), DIV, e)
 reduce (BINIX ((BINIX ((SIMPLE m), DIV, e)), MUL, (SIMPLE n))) = BINIX ((SIMPLE (n * m)), DIV, e)
 reduce (BINIX (e, RAI, SIMPLE 1)) = e
 reduce (BINIX (SIMPLE 0, RAI, SIMPLE 0)) = undefined
 reduce (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
+reduce (BINIX (e1, MIN, e2))
+ | e1 == e2 = SIMPLE 0
 reduce (BINIX (e1, t, e2))
  | calculateable e1 && calculateable e2 = SIMPLE $ calculate $ BINIX (e1, t, e2)
  | calculateable e1 = BINIX ((SIMPLE (calculate e1)), t, (reduce e2))
@@ -83,5 +87,5 @@ rebracketing (BINIX (e1, ADD, BINIX (e2, ADD, e3))) = BINIX (e1, ADD, rebracketi
 rebracketing e = e
 
 simplifying :: Expression -> Expression
-simplifying e = if e == summation (reduce (ordering (rebracketing (unbracketing e))))
-     then e else simplifying $ summation $ reduce $ ordering $ rebracketing $ unbracketing e
+simplifying e = if e == summation (reduce (ordering (rebracketing (unbracketing (reduce e)))))
+     then e else simplifying $ summation $ reduce $ ordering $ rebracketing $ unbracketing $ reduce e

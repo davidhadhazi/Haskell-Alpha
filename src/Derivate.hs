@@ -10,10 +10,12 @@ derivate (UNIX (NEG, e)) = UNIX (NEG, derivate e)
 derivate (BINIX (e1, ADD, e2)) = makeSyntax $ show (derivate e1) ++ "+" ++ show (derivate e2)
 derivate (BINIX (e1, MIN, e2)) = makeSyntax $ show (derivate e1) ++ "-" ++ show (derivate e2)
 derivate (BINIX (e1, MUL, e2)) = makeSyntax $ show (derivate e1) ++ "*" ++ show e2 ++ "+" ++ show e1 ++ "*" ++ show (derivate e2)
-derivate (BINIX (e1, DIV, e2)) = makeSyntax $ "(" ++ show (derivate e1) ++ "*" ++ show e2 ++ "-" ++ show e1 ++ "*" ++ show (derivate e2) ++ ")/" ++
+derivate (BINIX (e1, DIV, e2)) = 
+    -- BINIX (BINIX (BINIX (derivate e1, MUL, e2), MIN, BINIX (e2, MUL, derivate e1)), DIV, BINIX (e2, RAI, SIMPLE 2))
+    makeSyntax $ "(" ++ show (derivate e1) ++ "*" ++ show e2 ++ "-" ++ show e1 ++ "*" ++ show (derivate e2) ++ ")/" ++
                                                show e2 ++ "^2"
-derivate (BINIX (e1, RAI, e2)) = makeSyntax $ show e1 ++ "^" ++ show e2 ++ "*(" ++
-                                              show e2 ++ "*" ++ show (derivate e1) ++ "/" ++ show e1 ++ "+" ++ show (derivate e2) ++ "* ln" ++ show e1 ++ ")"
+derivate (BINIX (e1, RAI, e2)) = BINIX (BINIX (e1, RAI, e2), MUL,
+                                 BINIX (BINIX (BINIX (e2, MUL, derivate e1), DIV, e1), ADD, BINIX (derivate e2, MUL, UNIX (LN, e1))))
 derivate (BINIX (e1, LOG, e2)) = derivate $ BINIX (UNIX (LN, e2), DIV, UNIX (LN, e1))
 derivate (UNIX (LOG10, e)) = derivate $ BINIX (UNIX (LN, e), DIV, UNIX (LN, SIMPLE 10))
 derivate (UNIX (LN, e)) = BINIX (derivate e, DIV, e)              

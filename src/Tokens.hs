@@ -23,7 +23,7 @@ data Token
  | DOT
  | E
  | PI
- | PURE  Int
+ | PURE  Integer
  | NUM   Number'
  | PARAM Char
  deriving (Eq, Ord)

@@ -159,7 +159,9 @@ derivates = TestList [
                     TestLabel "derivate6" (TestCase (assertEqual "derivate6" (simplifying (derivate (makeSyntax "cos x"))) (UNIX (NEG, UNIX (SIN, VAR 'x'))))),
                     TestLabel "derivate7" (TestCase (assertEqual "derivate7" (simplifying (derivate (makeSyntax "sin x + 1"))) (UNIX (COS, VAR 'x')))),
                     TestLabel "derivate8" (TestCase (assertEqual "derivate8" (simplifying (derivate (makeSyntax "tan x"))) (BINIX (SIMPLE 1, DIV, BINIX (UNIX (COS, VAR 'x'), RAI, SIMPLE 2))))),
-                    TestLabel "derivate9" (TestCase (assertEqual "derivate9" (simplifying (derivate (makeSyntax "ctg x"))) (BINIX (SIMPLE 1, DIV, BINIX (UNIX (SIN, VAR 'x'), RAI, SIMPLE 2)))))
+                    TestLabel "derivate9" (TestCase (assertEqual "derivate9" (simplifying (derivate (makeSyntax "ctg x"))) (BINIX (SIMPLE 1, DIV, BINIX (UNIX (SIN, VAR 'x'), RAI, SIMPLE 2))))),
+                    TestLabel "derivate10" (TestCase (assertEqual "derivate10" (simplifying (derivate (makeSyntax "e^x"))) (BINIX (SIMPLE (exp 1), RAI, VAR 'x')))),
+                    TestLabel "derivate11" (TestCase (assertEqual "derivate11" (simplifying (derivate (makeSyntax "6^x"))) (BINIX (SIMPLE (log 6), MUL, BINIX (SIMPLE 6, RAI, VAR 'x')))))
                     ]
 
 tests :: Test
