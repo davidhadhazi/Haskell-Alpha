@@ -69,11 +69,11 @@ makeEnd dl
 
 fillingUp :: [Token] -> [Token]
 fillingUp [] = []
-fillingUp ((PURE n):(PARAM p):ts) = NUM (Integer (toInteger n)) : MUL : fillingUp (PARAM p:ts)
+fillingUp ((PURE n):(PARAM p):ts) = NUM (Integer n) : MUL : fillingUp (PARAM p:ts)
 fillingUp ((PARAM p1):(PARAM p2):ts) = PARAM p1 : MUL : fillingUp (PARAM p2:ts)
 fillingUp ((PURE n1):DOT:(PURE n2):ts) = NUM (Creal (fromIntegral n1 + makeEnd (fromIntegral n2))) : fillingUp ts
-fillingUp ((PURE n):ts) = NUM (Integer (toInteger n)) : fillingUp ts
-fillingUp (LOG :(PURE n):ts) = NUM (Integer (toInteger n)) : LOG : fillingUp ts
+fillingUp ((PURE n):ts) = NUM (Integer n) : fillingUp ts
+fillingUp (LOG :(PURE n):ts) = NUM (Integer n) : LOG : fillingUp ts
 fillingUp (LOG : OP : ts) = [OP] ++ fillingUp (takeColumns 0 ts) ++ [CL] ++ [LOG] ++ fillingUp (dropColumns 0 ts)
 fillingUp (t : MIN : ts)
  | isOperator t = fillingUp $ t : NEG : ts
