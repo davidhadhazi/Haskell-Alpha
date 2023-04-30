@@ -6,6 +6,7 @@ import SyntaxTree
 import Number
 import Simplification
 import Derivate
+import Integrate
 
 tokens :: Test
 tokens = TestList[
@@ -164,11 +165,19 @@ derivates = TestList [
                     TestLabel "derivate11" (TestCase (assertEqual "derivate11" (simplifying (derivate (makeSyntax "6^x"))) (BINIX (SIMPLE (log 6), MUL, BINIX (SIMPLE 6, RAI, VAR 'x')))))
                     ]
 
+indefinite_integrates :: Test
+indefinite_integrates = TestList [
+                                TestLabel "integrate0" (TestCase (assertEqual "integrate0" (simplifying (integrate (makeSyntax "0"))) (makeSyntax "0"))),
+                                TestLabel "integrate1" (TestCase (assertEqual "integrate1" (simplifying (integrate (makeSyntax "1"))) (makeSyntax "x"))),
+                                TestLabel "integrate2" (TestCase (assertEqual "integrate2" (simplifying (integrate (makeSyntax "5"))) (makeSyntax "5x")))
+                                ]
+
 tests :: Test
 tests = TestList [
                     TestLabel "tokens" tokens,
                     TestLabel "syntaxes" syntaxes,
                     TestLabel "calculations" calculations,
                     TestLabel "simplifyings" simplifyings,
-                    TestLabel "derivates" derivates
+                    TestLabel "derivates" derivates,
+                    TestLabel "indefinite_integrates" indefinite_integrates
                     ]

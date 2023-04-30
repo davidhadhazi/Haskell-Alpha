@@ -15,11 +15,6 @@ reduce :: Expression -> Expression
 reduce (SIMPLE n) = SIMPLE n
 reduce (VAR    x) = VAR    x
 reduce (UNIX (t, e)) = if calculateable e then SIMPLE (calculate (UNIX (t, e))) else UNIX (t, reduce e)
-reduce (BINIX (e1, t, e2))
- | calculateable e1 && calculateable e2 = SIMPLE $ calculate $ BINIX (e1, t, e2)
- | calculateable e1 = BINIX ((SIMPLE (calculate e1)), t, (reduce e2))
- | calculateable e2 = BINIX ((reduce e1), t, (SIMPLE (calculate e2)))
- | otherwise = BINIX ((reduce e1), t, (reduce e2))
 -------------------------------------------------------------------------
 reduce (BINIX (e, ADD, (SIMPLE 0))) = e
 reduce (BINIX ((SIMPLE 0), ADD, e)) = e
@@ -36,6 +31,11 @@ reduce (BINIX (SIMPLE 0, RAI, SIMPLE 0)) = undefined
 reduce (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
 reduce (BINIX (e1, MIN, e2))
  | e1 == e2 = SIMPLE 0
+reduce (BINIX (e1, t, e2))
+ | calculateable e1 && calculateable e2 = SIMPLE $ calculate $ BINIX (e1, t, e2)
+ | calculateable e1 = BINIX ((SIMPLE (calculate e1)), t, (reduce e2))
+ | calculateable e2 = BINIX ((reduce e1), t, (SIMPLE (calculate e2)))
+ | otherwise = BINIX ((reduce e1), t, (reduce e2))
 
 unbracketing :: Expression -> Expression
 unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE n, MUL, e2))
