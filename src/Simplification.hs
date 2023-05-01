@@ -18,6 +18,8 @@ reduce (UNIX (t, e)) = if calculateable e then SIMPLE (calculate (UNIX (t, e))) 
 -------------------------------------------------------------------------
 reduce (BINIX (e, ADD, (SIMPLE 0))) = e
 reduce (BINIX ((SIMPLE 0), ADD, e)) = e
+reduce (BINIX (e, MIN, SIMPLE 0)) = e
+reduce (BINIX (SIMPLE 0, MIN, e)) = UNIX (NEG, e)
 reduce (BINIX (e, MUL, (SIMPLE 1))) = e
 reduce (BINIX ((SIMPLE 1), MUL, e)) = e
 reduce (BINIX (_, MUL, (SIMPLE 0))) = SIMPLE 0
