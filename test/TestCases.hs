@@ -96,14 +96,14 @@ derivates = TestList [
 
 indefinite_integrates :: Test
 indefinite_integrates = TestList [
-                                TestCase (assertEqual "integrate0" (simplifying (integrate (makeSyntax "0"))) (makeSyntax "0")),
-                                TestCase (assertEqual "integrate1" (simplifying (integrate (makeSyntax "1"))) (makeSyntax "x")),
-                                TestCase (assertEqual "integrate2" (simplifying (integrate (makeSyntax "5"))) (makeSyntax "5x")),
-                                TestCase (assertEqual "integrate3" (simplifying (integrate (makeSyntax "-4"))) (makeSyntax "-4x")),
-                                TestCase (assertEqual "integrate4" (simplifying (integrate (makeSyntax "x"))) (simplifying (makeSyntax "1/2 * x^2"))),
-                                TestCase (assertEqual "integrate5" (simplifying (integrate (makeSyntax "2x"))) (makeSyntax "x^2")),
-                                TestCase (assertEqual "integrate6" (simplifying (integrate (makeSyntax "5x"))) (simplifying (makeSyntax "5/2 * x^2"))),
-                                TestCase (assertEqual "integrate7" (simplifying (integrate (makeSyntax "-7x"))) (simplifying (makeSyntax "-7/2 * x^2")))
+                                TestCase (assertEqual "integrate_0" (simplifying (integrate (makeSyntax "0"))) (makeSyntax "0")),
+                                TestCase (assertEqual "integrate_1" (simplifying (integrate (makeSyntax "1"))) (makeSyntax "x")),
+                                TestCase (assertEqual "integrate_5" (simplifying (integrate (makeSyntax "5"))) (makeSyntax "5x")),
+                                TestCase (assertEqual "integrate_-4" (simplifying (integrate (makeSyntax "-4"))) (makeSyntax "-4x")),
+                                TestCase (assertEqual "integrate_x" (simplifying (integrate (makeSyntax "x"))) (simplifying (makeSyntax "1/2 * x^2"))),
+                                TestCase (assertEqual "integrate_2x" (simplifying (integrate (makeSyntax "2x"))) (makeSyntax "x^2")),
+                                TestCase (assertEqual "integrate_5x" (simplifying (integrate (makeSyntax "5x"))) (simplifying (makeSyntax "5/2 * x^2"))),
+                                TestCase (assertEqual "integrate_-7x" (simplifying (integrate (makeSyntax "-7x"))) (simplifying (makeSyntax "-7/2 * x^2")))
                                 ]
 
 tests :: Test
