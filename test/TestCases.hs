@@ -103,7 +103,12 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_x" (simplifying (integrate (makeSyntax "x"))) (simplifying (makeSyntax "1/2 * x^2"))),
                                 TestCase (assertEqual "integrate_2x" (simplifying (integrate (makeSyntax "2x"))) (makeSyntax "x^2")),
                                 TestCase (assertEqual "integrate_5x" (simplifying (integrate (makeSyntax "5x"))) (simplifying (makeSyntax "5/2 * x^2"))),
-                                TestCase (assertEqual "integrate_-7x" (simplifying (integrate (makeSyntax "-7x"))) (simplifying (makeSyntax "-7/2 * x^2")))
+                                TestCase (assertEqual "integrate_-7x" (simplifying (integrate (makeSyntax "-7x"))) (simplifying (makeSyntax "-7/2 * x^2"))),
+                                TestCase (assertEqual "integrate_x^2" (simplifying (integrate (makeSyntax "x^2"))) (simplifying (makeSyntax "1/3 * x^3"))),
+                                TestCase (assertEqual "integrate_3x^2" (simplifying (integrate (makeSyntax "3x^2"))) (makeSyntax "x^3")),
+                                TestCase (assertEqual "integrate_3x^8" (simplifying (integrate (makeSyntax "3x^8"))) (simplifying (makeSyntax "1/3 * x^9"))),
+                                TestCase (assertEqual "integrate_5x^4+2x+1" (simplifying (integrate (makeSyntax "5x^4+2x+1"))) (makeSyntax "x+(x^2+x^5)")),
+                                TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "5x^4-2x+1"))) (makeSyntax "x-x^2+x^5"))
                                 ]
 
 tests :: Test
