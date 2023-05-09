@@ -6,6 +6,7 @@ import SyntaxTree
 summation, summationSum, summationProd :: Expression -> Expression
 summation = summationProd . summationSum
 
+summationSum (BINIX (e1, ADD, BINIX (SIMPLE (-1), MUL, e2))) = summation $ BINIX (e1, MIN, e2)
 summationSum (BINIX (e1, ADD, e2))
  | e1 == e2 = summation $ BINIX (SIMPLE 2, MUL, e1)
 summationSum (BINIX (e1, ADD, BINIX (e2, ADD, e3)))
@@ -34,6 +35,8 @@ summationSum (UNIX (t, e)) = UNIX (t, summation e)
 summationSum (VAR x) = VAR x
 summationSum (SIMPLE n) = SIMPLE n
 
+summationProd (BINIX (SIMPLE (-1), MUL, SIMPLE n)) = SIMPLE (-n)
+summationProd (BINIX (SIMPLE (-1), MUL, BINIX (SIMPLE n, MUL, e))) = BINIX (SIMPLE (-n), MUL, summation e)
 summationProd (BINIX (e1, MUL, e2))
  | e1 == e2 = summation $ BINIX (e1, RAI, SIMPLE 2)
 summationProd (BINIX (e1, MUL, UNIX (NEG,e2)))

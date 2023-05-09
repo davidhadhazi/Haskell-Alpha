@@ -41,18 +41,10 @@ reduce (BINIX (e1, t, e2))
 
 unbracketing :: Expression -> Expression
 unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE n, MUL, e2))
-unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e       --      - - a = a
-unbracketing (UNIX (NEG, (BINIX (e1, MIN, e2)))) = BINIX (unbracketing e2, MIN, unbracketing e1)        --      -(a - b) = b - a
+unbracketing (UNIX (NEG, e)) = BINIX (SIMPLE (-1), MUL, unbracketing e)
+unbracketing (BINIX (e1, MIN, e2)) = BINIX (unbracketing e1, ADD, BINIX (SIMPLE (-1), MUL, unbracketing e2))
 unbracketing (BINIX (e1, ADD, (UNIX (NEG, e2)))) = BINIX (unbracketing e1, MIN, unbracketing e2)        --      (a + -b) = a - b
 unbracketing (BINIX ((UNIX (NEG, e1)), ADD, e2)) = BINIX (unbracketing e2, MIN, unbracketing e1)        --      (-a + b) = b - a
-unbracketing (BINIX (e1, MIN, UNIX (NEG, e2)))   = BINIX (e1, ADD, e2)                                  --      (a - -b) = a + b
-unbracketing (UNIX (NEG, BINIX (e1, ADD, e2))) = unbracketing $ BINIX                                   --      -(a + b) = -a - b 
- (unbracketing (UNIX (NEG, e1)), ADD, unbracketing (UNIX (NEG, e2)))
------------------------------------------------------
-unbracketing (UNIX (NEG, BINIX (e1, MUL, UNIX (NEG, e2)))) = BINIX (unbracketing e1, MUL, unbracketing e2)      --      -(a * -b) = a * b
-unbracketing (UNIX (NEG, BINIX ((UNIX (NEG, e1)), MUL, e2))) = BINIX (unbracketing e1, MUL, unbracketing e2)    --      -(-a * b) = a * b
-unbracketing (UNIX (NEG, BINIX (e1, DIV, UNIX (NEG, e2)))) = BINIX (unbracketing e1, DIV, unbracketing e2)      --      -(a / -b) = a / b
-unbracketing (UNIX (NEG, BINIX ((UNIX (NEG, e1)), DIV, e2))) = BINIX (unbracketing e1, DIV, unbracketing e2)    --      -(-a / b) = a / b
 -----------------------------------------------------
 unbracketing (UNIX (LN, BINIX (exp1, RAI, exp2))) = BINIX (unbracketing exp2, MUL, UNIX (LN, unbracketing exp1))        --      ln (a^b) = b * ln a
 unbracketing (UNIX (LN, BINIX (UNIX (NEG, exp1), MUL, UNIX (NEG, exp2)))) = 

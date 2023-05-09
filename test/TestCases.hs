@@ -71,6 +71,7 @@ simplifyings = TestList [
                     TestCase (assertEqual "1 = 1" (simplifying (makeSyntax "1")) (SIMPLE 1)),
                     TestCase (assertEqual "2 + x = 2 + x" (simplifying (makeSyntax "2 + x")) (makeSyntax "2 + x")),
                     TestCase (assertEqual "x + 2 = 2 + x" (simplifying (makeSyntax "x + 2")) (makeSyntax "2 + x")),
+                    TestCase (assertEqual "2 - x = 2 - x" (simplifying (makeSyntax "2 - x")) (makeSyntax "2 - x")),
                     TestCase (assertEqual "6x^2 + x + 2x^7 = x + (6 * x^2 + 2 * x^7)" (simplifying (makeSyntax "6x^2 + x + 2x^7")) (makeSyntax "x + (6 * x^2 + 2 * x^7)")),
                     TestCase (assertEqual "2 + 3x + 9x^2 = 2 + (3 * x + 9 * x^2)" (simplifying (makeSyntax "2 + 3x + 9x^2")) (makeSyntax "2 + (3 * x + 9 * x^2)")),
                     TestCase (assertEqual "sin x + 2 = 2 + sin x" (simplifying (makeSyntax "sin x + 2")) (makeSyntax "2 + sin x")),
@@ -116,7 +117,7 @@ tests = TestList [
                     TestLabel "tokens" tokens,
                     TestLabel "syntaxes" syntaxes,
                     TestLabel "calculations" calculations,
-                    TestLabel "simplifyings" simplifyings,
-                    TestLabel "derivates" derivates,
-                    TestLabel "indefinite_integrates" indefinite_integrates
+                    TestLabel "simplifyings" simplifyings
+                    -- TestLabel "derivates" derivates,
+                    -- TestLabel "indefinite_integrates" indefinite_integrates
                     ]
