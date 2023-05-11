@@ -86,6 +86,7 @@ derivates = TestList [
                     TestCase (assertEqual "x^2' = 2x" (simplifying (derivate (makeSyntax "x^2"))) (makeSyntax "2x")),
                     TestCase (assertEqual "(x+1)^2' = 2 + 2x" (simplifying (derivate (makeSyntax "(x+1)^2"))) (makeSyntax "2 + 2x")),
                     TestCase (assertEqual "(x+1)^7' = 7 * (1 + x)^6" (simplifying (derivate (makeSyntax "(x+1)^7"))) (makeSyntax "7 * (1 + x)^6")),
+                    TestCase (assertEqual "(x-1)^7' = 7 * (-1 + x)^6" (simplifying (derivate (makeSyntax "(x-1)^7"))) (simplifying (makeSyntax "7 * (-1 + x)^6"))),
                     TestCase (assertEqual "sin x' = cos x" (simplifying (derivate (makeSyntax "sin x"))) (makeSyntax "cos x")),
                     TestCase (assertEqual "cos x' = -sin x" (simplifying (derivate (makeSyntax "cos x"))) (makeSyntax "-sin x")),
                     TestCase (assertEqual "sin x + 1' = cos x" (simplifying (derivate (makeSyntax "sin x + 1"))) (makeSyntax "cos x")),

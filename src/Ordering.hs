@@ -2,7 +2,7 @@ module Ordering (ordering) where
 
 import Tokens
 import SyntaxTree
-import Data.List
+import Data.List (sort)
 
 orderingSum, orderingMul, ordering :: Expression -> Expression
 
@@ -36,6 +36,9 @@ orderingSum (BINIX (e1, ADD, e2))
 orderingSum (BINIX (e1, t, e2)) = BINIX (ordering e1, t, ordering e2)
 orderingSum e = e
 
+orderingMul (BINIX (e1, MUL, BINIX (e2, MUL, e3))) = list where
+    l = sort [e1, e2, e3]
+    list = BINIX (head l, MUL, ordering (BINIX (head (tail l), MUL, last l)))
 orderingMul (BINIX (e1, MUL, e2))
  | e1 > e2 = BINIX (ordering e2, MUL, ordering e1)
  |otherwise = BINIX (e1, MUL, e2)
