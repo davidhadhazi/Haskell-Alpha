@@ -112,7 +112,14 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_5x^4+2x+1" (simplifying (integrate (makeSyntax "5x^4+2x+1"))) (makeSyntax "x+(x^2+x^5)")),
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "5x^4-2x+1"))) (makeSyntax "x-x^2+x^5")),
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x+1"))) (makeSyntax "x-x^2-x^5")),
-                                TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x-1"))) (simplifying (makeSyntax "-x-x^2-x^5")))
+                                TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x-1"))) (simplifying (makeSyntax "-x-x^2-x^5"))),
+                                TestCase (assertEqual "integrate_e^x" (simplifying (integrate (makeSyntax "e^x"))) (makeSyntax "e^x")),
+                                TestCase (assertEqual "integrate_xsinx" (simplifying (integrate (makeSyntax "x * sin x"))) (simplifying (makeSyntax "sin x - x * cos x"))),
+                                TestCase (assertEqual "integrate_sinx * x" (simplifying (integrate (simplifying (makeSyntax "sin x * x")))) (simplifying (makeSyntax "sin x - x * cos x"))),
+                                TestCase (assertEqual "integrate_xcosx" (simplifying (integrate (makeSyntax "x * cos x"))) (simplifying (makeSyntax "x * sin x + cos x"))),
+                                TestCase (assertEqual "integrate_cosx * x" (simplifying (integrate (simplifying (makeSyntax "cos x * x")))) (simplifying (makeSyntax "cos x + x * sin x"))),
+                                TestCase (assertEqual "integrate_sinx * cosx" (simplifying (integrate (simplifying (makeSyntax "sin x * cos x")))) (simplifying (makeSyntax "-(cos x)^2 / 2"))),
+                                TestCase (assertEqual "integrate_cosx * sinx" (simplifying (integrate (simplifying (makeSyntax "cos x * sin x")))) (simplifying (makeSyntax "-(cos x)^2 / 2")))
                                 ]
 
 tests :: Test

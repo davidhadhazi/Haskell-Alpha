@@ -7,6 +7,8 @@ import Summation
 
 unbracketing :: Expression -> Expression
 unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE n, MUL, e2))
+unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e
+unbracketing (UNIX (NEG, SIMPLE n)) = SIMPLE (-n)
 unbracketing (UNIX (NEG, e)) = BINIX (SIMPLE (-1), MUL, unbracketing e)
 unbracketing (BINIX (e1, MIN, e2)) = BINIX (unbracketing e1, ADD, BINIX (SIMPLE (-1), MUL, unbracketing e2))
 -----------------------------------------------------
@@ -49,6 +51,12 @@ rebracketing (BINIX (BINIX (e1, MUL, e2), MUL, e3)) = rebracketing (BINIX (e1, M
 rebracketing (BINIX (e1, MUL, BINIX (e2, MUL, e3))) = BINIX (e1, MUL, rebracketing (BINIX (e2, MUL, e3)))
 rebracketing e = e
 
+negation :: Expression -> Expression
+negation (BINIX (e1, ADD, UNIX (NEG, e2))) = negation $ BINIX (e1, MIN, e2)
+negation (BINIX (e1, t, e2)) = BINIX (negation e1, t, negation e2)
+negation (UNIX (t, e)) = UNIX (t, negation e)
+negation e = e
+
 simplifying :: Expression -> Expression
-simplifying e = if e == summation ( (ordering (rebracketing (unbracketing ( e)))))
-     then e else simplifying $ summation $ ordering $ rebracketing $ unbracketing e
+simplifying e = if e == negation (summation (ordering (rebracketing (unbracketing e))))
+     then e else simplifying $ negation $ summation $ ordering $ rebracketing $ unbracketing e

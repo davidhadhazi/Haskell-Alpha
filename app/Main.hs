@@ -9,6 +9,7 @@ import qualified Data.Text as T
 import qualified SyntaxTree as ST
 import qualified Simplification as SM
 import qualified Derivate as DV
+import qualified Integrate as IN
 
 eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) ->IO ()
 eval ent1 ent2 f = do
@@ -35,7 +36,7 @@ main = do
     derButton <- new Gtk.Button [#label := "derivate"]
     _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax))
     intButton <- new Gtk.Button [#label := "integrate"]
-    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax))
+    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax))
     _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax))
     
     #add box entry
