@@ -24,7 +24,12 @@ dependencies:
 - gi-gtk
 - haskell-gi-base
 - text
-- parsec
+- Chart
+- Chart-diagrams
+- Chart-cairo
+- colour
+- lens
+- data-default-class
 
 ghc-options:
 - -Wall

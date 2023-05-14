@@ -1,4 +1,4 @@
-module SyntaxTree (makeSyntax, calculate, Expression (..)) where
+module SyntaxTree (makeSyntax, calculate, replace, Expression (..)) where
 
 import Tokens
 import Number
@@ -42,6 +42,12 @@ instance Show Expression where
   show (VAR x)    = x : []
   show (UNIX (t, expr)) = show t ++ "(" ++ show expr ++ ")"
   show (BINIX (e1, t, e2)) = "(" ++ show e1 ++ " " ++ show t ++ " " ++ show e2 ++ ")"
+
+replace :: Double -> Expression -> Expression
+replace n (VAR _) = SIMPLE (Creal (realToFrac n))
+replace _ (SIMPLE n) = SIMPLE n
+replace n (UNIX (t, e)) = UNIX (t, replace n e)
+replace n (BINIX (e1, t, e2)) = BINIX (replace n e1, t, replace n e2)
 
 buildTree :: [LeveledToken] -> Expression
 -- One attributed tokens

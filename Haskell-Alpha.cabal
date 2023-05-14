@@ -39,10 +39,15 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      Chart
+    , Chart-cairo
+    , Chart-diagrams
+    , base >=4.7 && <5
+    , colour
+    , data-default-class
     , gi-gtk
     , haskell-gi-base
-    , parsec
+    , lens
     , text
   default-language: Haskell2010
 
@@ -54,11 +59,16 @@ executable Haskell-Alpha-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      Haskell-Alpha
+      Chart
+    , Chart-cairo
+    , Chart-diagrams
+    , Haskell-Alpha
     , base >=4.7 && <5
+    , colour
+    , data-default-class
     , gi-gtk
     , haskell-gi-base
-    , parsec
+    , lens
     , text
   default-language: Haskell2010
 
@@ -72,11 +82,16 @@ test-suite Haskell-Alpha-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      HUnit
+      Chart
+    , Chart-cairo
+    , Chart-diagrams
+    , HUnit
     , Haskell-Alpha
     , base >=4.7 && <5
+    , colour
+    , data-default-class
     , gi-gtk
     , haskell-gi-base
-    , parsec
+    , lens
     , text
   default-language: Haskell2010

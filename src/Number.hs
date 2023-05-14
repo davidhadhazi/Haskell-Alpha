@@ -1,4 +1,4 @@
-module Number (Number' (..), round') where
+module Number (Number' (..), round', toDouble) where
 
 import GHC.Real
 import CReal
@@ -21,6 +21,10 @@ round' (Creal c) = if round c == c then Integer (round c) else (Creal c)
 -- round' (Integer i) = Integer i
 -- round' (Frac (n,d)) = Frac (n,d)
 round' e = e
+
+toDouble :: Number' -> Double
+toDouble (Integer i) = fromInteger i
+toDouble n = read (show n) :: Double
 
 instance Eq Number' where
   (==) (Integer   i1) (Integer   i2) = i1 == i2

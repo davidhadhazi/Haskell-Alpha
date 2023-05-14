@@ -10,13 +10,38 @@ import qualified SyntaxTree as ST
 import qualified Simplification as SM
 import qualified Derivate as DV
 import qualified Integrate as IN
+import qualified Number as N
 
-eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) ->IO ()
+import Data.Colour
+import Data.Colour.Names
+import Data.Default.Class
+import Graphics.Rendering.Chart.Backend.Cairo
+
+import Graphics.Rendering.Chart.Easy
+
+eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) -> IO ()
 eval ent1 ent2 f = do
     txt <- Gtk.entryGetText ent1
     let txt' = f $ T.unpack txt
     Gtk.entrySetText ent2 $ T.pack txt'
+    genImage ent2
     -- set ent1 [#text := ""]
+
+am :: ST.Expression -> Double -> Double
+am expr x = N.toDouble $ ST.calculate $ ST.replace x expr
+
+signal :: ST.Expression -> [Double] -> [(Double,Double)]
+signal expr xs = [ (x, sin (x * x)) | x <- xs ]
+
+genImage :: Gtk.Entry -> IO ()
+genImage ent = do
+    txt <- Gtk.entryGetText ent
+    let expr = ST.makeSyntax $ T.unpack txt
+
+    toFile def "asd.jpeg" $ do
+        setColors [opaque blue]
+        plot (line "" [signal expr [0,(0.01)..10]])
+
 
 main :: IO()
 main = do
