@@ -1,4 +1,4 @@
-module SyntaxTree (makeSyntax, calculate, replace, Expression (..)) where
+module SyntaxTree (makeSyntax, calculate, replace, reducing, Expression (..)) where
 
 import Tokens
 import Number
@@ -116,6 +116,12 @@ calculate (BINIX (exp1, ADD, exp2)) = round' $  (+) (calculate exp1) (calculate 
 calculate (BINIX (exp1, MIN, exp2)) = round' $  (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = round' $  (*) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, DIV, exp2)) = round' $  (/) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, RAI, exp2)) = round' $ (**) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, RAI, exp2))
+ | round' (calculate exp1) == Integer 0 && round' (calculate exp2) == Integer 0 = undefined
+ | round' (calculate exp1) == Integer 0 = Integer 0
+ | round' (calculate exp2) == Integer 0 = Integer 1
+ | round' (calculate exp1) == Integer 1 = Integer 1
+ | round' (calculate exp1) == Integer 0 = Integer 0
+ |otherwise = round' $ (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
 

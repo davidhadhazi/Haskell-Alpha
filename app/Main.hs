@@ -31,16 +31,16 @@ am :: ST.Expression -> Double -> Double
 am expr x = N.toDouble $ ST.calculate $ ST.replace x expr
 
 signal :: ST.Expression -> [Double] -> [(Double,Double)]
-signal expr xs = [ (x, sin (x * x)) | x <- xs ]
+signal expr = map (\x -> (x, am expr x))
 
 genImage :: Gtk.Entry -> IO ()
 genImage ent = do
     txt <- Gtk.entryGetText ent
     let expr = ST.makeSyntax $ T.unpack txt
 
-    toFile def "asd.jpeg" $ do
+    toFile def "src/asd.jpeg" $ do
         setColors [opaque blue]
-        plot (line "" [signal expr [0,(0.01)..10]])
+        plot (line "" ([signal expr ([0.0,0.01 .. 10.0])]))
 
 
 main :: IO()
