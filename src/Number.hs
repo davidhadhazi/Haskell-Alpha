@@ -80,6 +80,7 @@ instance Num Number' where
 instance Fractional Number' where
   fromRational x = Creal (fromRational x)
 
+  (/) _ (Integer 0) = undefined
   (/) (Integer i) (Integer 1) = Integer i
   (/) (Integer i) (Integer (-1)) = Integer (-i)
   (/) (Integer i1) (Integer i2) = Frac (numerator (i1 % i2), denominator (i1 % i2))

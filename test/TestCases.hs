@@ -14,7 +14,7 @@ tokens = TestList[
                   TestCase (assertEqual "1 1" (stringToTokens "1 1") [PURE 1, PURE 1]),
                   TestCase (assertEqual "1              1 = 1 1" (stringToTokens "1                1") [PURE 1, PURE 1]), 
                   TestCase (assertEqual "123" (stringToTokens "123") [PURE 123]),
-                  TestCase (assertEqual "1.2" (stringToTokens "1.2") [PURE 1, DOT, PURE 2]),
+                  TestCase (assertEqual "1.2" (stringToTokens "1.2") [PURE 1, ADD, NUM (Creal 0.2)]),
                   TestCase (assertEqual "pi" (stringToTokens "pi") [PI]),
                   TestCase (assertEqual "e" (stringToTokens "e") [E]),
                   TestCase (assertEqual "+" (stringToTokens "+") [ADD]),

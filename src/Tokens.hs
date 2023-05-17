@@ -45,6 +45,7 @@ instance Show Token where
     show E = "e"
     show PI = "pi"
     show (NUM n) = show n
+    show (PURE n) = show n 
     show _ = undefined
 
 isInfixR :: Token -> Bool
@@ -105,7 +106,7 @@ stringToTokens ('(':            s) = OP    : stringToTokens s
 stringToTokens (')':            s) = CL    : stringToTokens s
 stringToTokens ('.':            s) = ts where
     digits = takeWhile isDigit s
-    n = NUM $ (Integer (read digits)) / (Integer (10 ^ (length digits)))
+    n = NUM $ (Creal (read digits / (10 ^ (length digits)) :: CReal))
     ts = ADD : n : stringToTokens (dropWhile isDigit s)
 stringToTokens ('p':'i':        s) = PI    : stringToTokens s
 stringToTokens ('e':            s) = E     : stringToTokens s
@@ -120,4 +121,3 @@ stringToTokens ('c':'t':'g':    s) = CTG   : stringToTokens s
 stringToTokens (x:xs)
  | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
  | isLetter x = PARAM x : stringToTokens xs
- | otherwise = undefined

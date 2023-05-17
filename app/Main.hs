@@ -17,15 +17,31 @@ import Data.Colour.Names
 import Data.Default.Class
 import Graphics.Rendering.Chart.Backend.Cairo
 
+import Control.Exception
+
 import Graphics.Rendering.Chart.Easy
+
+calc :: (String -> String) -> String -> IO (String)
+calc f str = do
+    let txt = f str
+    return txt
 
 eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) -> IO ()
 eval ent1 ent2 f = do
     txt <- Gtk.entryGetText ent1
-    let txt' = f $ T.unpack txt
-    Gtk.entrySetText ent2 $ T.pack txt'
-    genImage ent2
+    
+    catch (Gtk.entrySetText ent2 (T.pack (f (T.unpack txt)))) handler where
+        handler :: SomeException -> IO ()
+        handler _ = Gtk.entrySetText ent2 $ T.pack "Error"
+
+    -- result <- try (calc f (T.unpack txt)) :: IO (Either SomeException String)
+    -- case result of
+    --     Left _ -> Gtk.entrySetText ent2 $ T.pack "Error"
+    --     Right str -> Gtk.entrySetText ent2 $ T.pack str
+
+    -- genImage ent2
     -- set ent1 [#text := ""]
+
 
 am :: ST.Expression -> Double -> Double
 am expr x = N.toDouble $ ST.calculate $ ST.replace x expr
@@ -63,6 +79,7 @@ main = do
     intButton <- new Gtk.Button [#label := "integrate"]
     _ <- on intButton #clicked (eval entry result (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax))
     _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax))
+
     
     #add box entry
     #add box derButton

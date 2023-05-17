@@ -100,18 +100,13 @@ calculate (UNIX (COS, expr)) = e where
     | co == (Creal 3 * pi / 2) = Integer 0
     | co == (Creal 5 * pi / 3) = Frac (1, 2)
     | otherwise = cos co
-calculate (UNIX (TAN, expr)) = e where
-  ta = reducing (calculate expr) $ Creal pi
-  e | ta == (Creal pi / 4) = Integer 1
-    | ta == (Creal 3 * pi / 4) = Integer $ -1
-    | otherwise = tan ta
-calculate (UNIX (CTG, expr)) = e where
-  ct = reducing (calculate expr) $ Creal pi
-  e | ct == 0 = Integer 0
-      |otherwise = 1 / tan ct
-calculate (BINIX (exp1, LOG, exp2)) = round' $ (/) (log (calculate exp2)) $ log $ calculate exp1
-calculate (UNIX (LOG10, expr)) = round' $ (/) (log (calculate expr)) $ log 10
-calculate (UNIX (LN, expr)) = round' $ log $ calculate expr
+calculate (UNIX (TAN, expr)) = calculate (BINIX (UNIX (SIN, expr), DIV, UNIX (COS, expr)))
+calculate (UNIX (CTG, expr)) = calculate (BINIX (UNIX (COS, expr), DIV, UNIX (SIN, expr)))
+calculate (BINIX (exp1, LOG, exp2)) = calculate (BINIX (UNIX (LN, exp2), DIV, UNIX (LN, exp1)))
+calculate (UNIX (LOG10, expr)) = calculate (BINIX (UNIX (LN, expr), DIV, UNIX (LN, SIMPLE 10)))
+calculate (UNIX (LN, expr)) 
+ | round' (calculate expr) == Integer 0 = undefined 
+ |otherwise = round' $ log $ calculate expr
 calculate (BINIX (exp1, ADD, exp2)) = round' $  (+) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MIN, exp2)) = round' $  (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = round' $  (*) (calculate exp1) (calculate exp2)
