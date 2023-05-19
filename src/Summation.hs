@@ -66,6 +66,10 @@ summationProd (BINIX (BINIX (e1, RAI, SIMPLE n), MUL, BINIX (e2, RAI, SIMPLE m))
  | e1 == e2 = BINIX (summation e1, RAI, SIMPLE (n + m))        -- e ^ n * e ^ m = e ^ (n + m)
 summationProd (BINIX (BINIX (e1, RAI, e2), MUL, BINIX (e3, DIV, e4))) 
  | e1 == e4 = summation $ BINIX (e3, MUL, BINIX (e1, RAI, BINIX (e2, MIN, SIMPLE 1)))
+summationProd (BINIX (BINIX (SIMPLE n, MUL, e1), DIV, e2))
+ | e1 == e2 = SIMPLE n
+summationProd (BINIX (e1, DIV, e2))
+ | e1 == e2 = SIMPLE 1
 summationProd (BINIX (SIMPLE (-1), MUL, e)) = UNIX (NEG, e)
 summationProd (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
 summationProd (UNIX (t, e)) = UNIX (t, summation e)

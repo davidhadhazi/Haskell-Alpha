@@ -121,3 +121,4 @@ stringToTokens ('c':'t':'g':    s) = CTG   : stringToTokens s
 stringToTokens (x:xs)
  | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
  | isLetter x = PARAM x : stringToTokens xs
+stringToTokens _ = undefined

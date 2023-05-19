@@ -32,7 +32,7 @@ eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) -> IO ()
 eval ent1 ent2 f = do
     txt <- Gtk.entryGetText ent1
     catch (writeResult txt ent2 f) (writeError ent2)
-    genImage ent2
+    -- genImage ent2
 
 
 am :: ST.Expression -> Double -> IO (Maybe Double)
@@ -41,16 +41,6 @@ am expr x = do
     case result of
         Left _ -> return Nothing
         Right n -> return $ Just n
-
--- signal :: ST.Expression -> [Double] -> [(Double,Double)]
--- signal expr = map (\x -> (x, am expr x))
-
--- genPoint :: ST.Expression -> Double -> IO (Either Double Char)
--- genPoint expr n = do
---     x <- (Left (catch (am expr n))) _ 
---     return x where
---         handler :: SomeException -> IO (Double)
---         handler _ = return 0
 
 genPoints :: ST.Expression -> [Double] -> IO ([(Double, Double)])
 genPoints _ [] = do

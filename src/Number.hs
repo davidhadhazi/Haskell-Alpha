@@ -30,6 +30,8 @@ instance Eq Number' where
   (==) (Integer   i1) (Integer   i2) = i1 == i2
   (==) (Creal     f1) (Creal     f2) = f1 == f2
   (==) (Frac (n1,d1)) (Frac (n2,d2)) = (numerator (n1 % d1) == numerator (n2 % d2)) && denominator (n1 % d1) == denominator (n2 % d2)
+  (==) (Frac   (n,d)) (Integer    i) = (numerator (n % d) == i) && (denominator (n % d) == 1)
+  (==) (Integer    i) (Frac   (n,d)) = (numerator (n % d) == i) && (denominator (n % d) == 1)
   (==)            _             _  = False
 
 instance Ord Number' where

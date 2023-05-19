@@ -114,12 +114,24 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x+1"))) (makeSyntax "x-x^2-x^5")),
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x-1"))) (simplifying (makeSyntax "-x-x^2-x^5"))),
                                 TestCase (assertEqual "integrate_e^x" (simplifying (integrate (makeSyntax "e^x"))) (makeSyntax "e^x")),
+                                TestCase (assertEqual "integrate_sinx" (simplifying (integrate (makeSyntax "sin x"))) (simplifying (makeSyntax "-cos x"))),
+                                TestCase (assertEqual "integrate_cosx" (simplifying (integrate (makeSyntax "cos x"))) (simplifying (makeSyntax "sin x"))),
+                                TestCase (assertEqual "integrate_tanx" (simplifying (integrate (simplifying (makeSyntax "tan x")))) (simplifying (makeSyntax "-ln(cos x)"))),
+                                TestCase (assertEqual "integrate_ctgx" (simplifying (integrate (simplifying (makeSyntax "ctg x")))) (simplifying (makeSyntax "ln(sin x)"))),
+                                TestCase (assertEqual "integrate_x sin(x^2)" (simplifying (integrate (simplifying (makeSyntax "x * sin(x^2)")))) (simplifying (makeSyntax "(-1/2) * cos(x^2)"))),
+                                TestCase (assertEqual "integrate_2x+3 sin(x^2+3x+4)" (simplifying (integrate (simplifying (makeSyntax "(2x + 3) * sin(x^2 + 3x + 4)")))) (simplifying (makeSyntax "-cos(x^2 + 3x + 4)"))),
+                                TestCase (assertEqual "integrate_x cos(x^2)" (simplifying (integrate (simplifying (makeSyntax "x * cos(x^2)")))) (simplifying (makeSyntax "(1/2) * sin(x^2)"))),
+                                TestCase (assertEqual "integrate_(5x^4 + 2x + 3) cos(x^5 + x^2 + 3x -8)" (simplifying (integrate (simplifying (makeSyntax "(5x^4 + 2x + 3) * cos(x^5 + x^2 + 3x -8)")))) (simplifying (makeSyntax "sin (x^5 + x^2 + 3x - 8)"))),
+                                TestCase (assertEqual "integrate_x tan (x^2)" (simplifying (integrate (simplifying (makeSyntax "x*tan(x^2)")))) (simplifying (makeSyntax "(-1/2) * ln(cos(x^2))"))),
+                                TestCase (assertEqual "integrate_6x + 3 tan (x^2 + x)" (simplifying (integrate (simplifying (makeSyntax "(6x + 3)*tan(x^2 + x)")))) (simplifying (makeSyntax "(-3) * ln(cos(x^2 + x))"))),
+                                TestCase (assertEqual "integrate_x ctg(x^2)" (simplifying (integrate (simplifying (makeSyntax "x * ctg(x^2)")))) (simplifying (makeSyntax "(1/2) * ln(sin(x^2))"))),
+                                TestCase (assertEqual "integrate_x^3+x ctg(x^4 + 2x^2 + 4)" (simplifying (integrate (simplifying (makeSyntax "(x^3 + x) * ctg(x^4 + 2 * x^2 + 4)")))) (simplifying (makeSyntax "(1/4) * ln(sin(x^4 + 2*x^2 + 4))"))),
+                                TestCase (assertEqual "integrate_sinx * cosx" (simplifying (integrate (simplifying (makeSyntax "sin x * cos x")))) (simplifying (makeSyntax "-(cos x)^2 / 2"))),
+                                TestCase (assertEqual "integrate_cosx * sinx" (simplifying (integrate (simplifying (makeSyntax "cos x * sin x")))) (simplifying (makeSyntax "-(cos x)^2 / 2"))),
                                 TestCase (assertEqual "integrate_xsinx" (simplifying (integrate (makeSyntax "x * sin x"))) (simplifying (makeSyntax "sin x - x * cos x"))),
                                 TestCase (assertEqual "integrate_sinx * x" (simplifying (integrate (simplifying (makeSyntax "sin x * x")))) (simplifying (makeSyntax "sin x - x * cos x"))),
                                 TestCase (assertEqual "integrate_xcosx" (simplifying (integrate (makeSyntax "x * cos x"))) (simplifying (makeSyntax "x * sin x + cos x"))),
-                                TestCase (assertEqual "integrate_cosx * x" (simplifying (integrate (simplifying (makeSyntax "cos x * x")))) (simplifying (makeSyntax "cos x + x * sin x"))),
-                                TestCase (assertEqual "integrate_sinx * cosx" (simplifying (integrate (simplifying (makeSyntax "sin x * cos x")))) (simplifying (makeSyntax "-(cos x)^2 / 2"))),
-                                TestCase (assertEqual "integrate_cosx * sinx" (simplifying (integrate (simplifying (makeSyntax "cos x * sin x")))) (simplifying (makeSyntax "-(cos x)^2 / 2")))
+                                TestCase (assertEqual "integrate_cosx * x" (simplifying (integrate (simplifying (makeSyntax "cos x * x")))) (simplifying (makeSyntax "cos x + x * sin x")))
                                 ]
 
 tests :: Test
