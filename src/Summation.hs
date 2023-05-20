@@ -23,6 +23,8 @@ summationSimples (BINIX (SIMPLE (-1), MUL, UNIX (t, e))) = UNIX (NEG, summation 
 summationSimples (BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE (-1)))) = summation $ BINIX (e1, DIV, e2)
 summationSimples (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
 summationSimples (BINIX (e, RAI, SIMPLE 1)) = summation e
+summationSimples (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
+summationSimples (UNIX (t, e)) = UNIX (t, summation e)
 summationSimples e = e
 
 summationSum (BINIX (e1, ADD, e2))

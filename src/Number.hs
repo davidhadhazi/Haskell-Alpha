@@ -1,4 +1,4 @@
-module Number (Number' (..), round', toDouble) where
+module Number (Number' (..), round', toDouble, isInteger) where
 
 import GHC.Real
 import CReal
@@ -18,9 +18,11 @@ instance Show Number' where
 
 round' :: Number' -> Number'
 round' (Creal c) = if round c == c then Integer (round c) else (Creal c)
--- round' (Integer i) = Integer i
--- round' (Frac (n,d)) = Frac (n,d)
 round' e = e
+
+isInteger :: Number' -> Bool
+isInteger (Integer _) = True
+isInteger _ = False
 
 toDouble :: Number' -> Double
 toDouble (Integer i) = fromInteger i
