@@ -36,6 +36,9 @@ unbracketing (BINIX (n, LOG, BINIX (UNIX (NEG, exp1), DIV, UNIX (NEG, exp2)))) =
  BINIX (BINIX (n, LOG, unbracketing exp1), MIN, BINIX (n, LOG, unbracketing exp2))
 unbracketing (BINIX (n, LOG, BINIX (exp1, DIV, exp2))) = BINIX (BINIX (n, LOG, unbracketing exp1), MIN, BINIX (n, LOG, unbracketing exp2))
 -----------------------------------------------------
+unbracketing (BINIX (e, RAI, (SIMPLE n)))
+ | n < 0 = BINIX (SIMPLE 1, DIV, BINIX (e, RAI, SIMPLE (negate n)))
+-----------------------------------------------------
 unbracketing (BINIX (e1, t, e2)) = BINIX (unbracketing e1, t, unbracketing e2)
 unbracketing (UNIX (t, e)) = UNIX (t, unbracketing e)
 unbracketing (SIMPLE n) = SIMPLE n

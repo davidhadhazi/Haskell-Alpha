@@ -45,8 +45,6 @@ genImage ent = do
     txt <- Gtk.entryGetText ent
     let expr = ST.makeSyntax $ T.unpack txt
     let myPoints = genPoints expr $ map (\x -> (fromIntegral . round $ x * 10) / 10 ) [0.1,0.2..10.0]
-    -- [0.1,0.2..10.0]
-    print myPoints
 
     toFile def "src/asd.jpeg" $ do
         setColors [opaque blue]
