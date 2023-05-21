@@ -30,6 +30,7 @@ dependencies:
 - colour
 - lens
 - data-default-class
+- split
 
 ghc-options:
 - -Wall

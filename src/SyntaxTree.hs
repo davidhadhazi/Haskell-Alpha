@@ -79,7 +79,7 @@ makeSyntax :: String -> Expression
 makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 isCalculateable :: Expression -> Bool
-isCalculateable (BINIX (_, DIV, SIMPLE 0)) = False
+isCalculateable (BINIX (e1, DIV, e2)) = isCalculateable e1 && isCalculateable e2 && calculate e2 /= 0
 isCalculateable (BINIX (e1, LOG, e2)) = isCalculateable (BINIX (UNIX (LN, e2), DIV, UNIX (LN, e1)))
 isCalculateable (UNIX (LOG10, e)) = isCalculateable e && calculate e > 0
 isCalculateable (UNIX (LN, e)) = isCalculateable e && calculate e > 0
@@ -87,8 +87,8 @@ isCalculateable (BINIX (e1, RAI, e2)) = isCalculateable e1 && isCalculateable e2
 isCalculateable (UNIX (TAN, e)) = isCalculateable e && 0 /= calculate (UNIX (COS, e))
 isCalculateable (UNIX (CTG, e)) = isCalculateable e && 0 /= calculate (UNIX (SIN, e))
 --------------------------------------------------------------
-isCalculateable (BINIX (e1, t, e2)) = isCalculateable e1 && isCalculateable e2
-isCalculateable (UNIX (t, e)) = isCalculateable e
+isCalculateable (BINIX (e1, _, e2)) = isCalculateable e1 && isCalculateable e2
+isCalculateable (UNIX (_, e)) = isCalculateable e
 isCalculateable (SIMPLE _) = True
 
 calculate :: Expression -> Number'
@@ -130,6 +130,9 @@ calculate (BINIX (exp1, RAI, exp2))
  | round' (calculate exp2) == Integer 0 = Integer 1
  | round' (calculate exp1) == Integer 1 = Integer 1
  | round' (calculate exp1) == Integer 0 = Integer 0
+ | (calculate exp1) < 0 = case (calculate exp2) of
+    Integer n -> if n > 0 then calculate (BINIX (exp1, MUL, BINIX (exp1, RAI, SIMPLE ((calculate exp2) - 1)))) else undefined
+    _ -> undefined
  |otherwise = round' $ (**) (calculate exp1) (calculate exp2)
 calculate _ = undefined
 
