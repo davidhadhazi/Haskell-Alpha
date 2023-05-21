@@ -79,13 +79,13 @@ makeSyntax :: String -> Expression
 makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
 isCalculateable :: Expression -> Bool
-isCalculateable (BINIX (e1, DIV, e2)) = isCalculateable e1 && isCalculateable e2 && calculate e2 /= 0
+isCalculateable (BINIX (e1, DIV, e2)) = isCalculateable e1 && isCalculateable e2 && calculate e2 /= (Creal 0)
 isCalculateable (BINIX (e1, LOG, e2)) = isCalculateable (BINIX (UNIX (LN, e2), DIV, UNIX (LN, e1)))
-isCalculateable (UNIX (LOG10, e)) = isCalculateable e && calculate e > 0
-isCalculateable (UNIX (LN, e)) = isCalculateable e && calculate e > 0
-isCalculateable (BINIX (e1, RAI, e2)) = isCalculateable e1 && isCalculateable e2 && not (calculate e1 == 0 && calculate e2 == 0) && not (calculate e1 < 0 && not (isInteger (calculate e2)))
-isCalculateable (UNIX (TAN, e)) = isCalculateable e && 0 /= calculate (UNIX (COS, e))
-isCalculateable (UNIX (CTG, e)) = isCalculateable e && 0 /= calculate (UNIX (SIN, e))
+isCalculateable (UNIX (LOG10, e)) = isCalculateable e && calculate e > (Creal 0)
+isCalculateable (UNIX (LN, e)) = isCalculateable e && calculate e > (Creal 0)
+isCalculateable (BINIX (e1, RAI, e2)) = isCalculateable e1 && isCalculateable e2 && not (calculate e1 == (Creal 0) && calculate e2 == (Creal 0)) && not (calculate e1 < (Creal 0) && not (isInteger (calculate e2)))
+isCalculateable (UNIX (TAN, e)) = isCalculateable e && (Creal 0) /= calculate (UNIX (COS, e))
+isCalculateable (UNIX (CTG, e)) = isCalculateable e && (Creal 0) /= calculate (UNIX (SIN, e))
 --------------------------------------------------------------
 isCalculateable (BINIX (e1, _, e2)) = isCalculateable e1 && isCalculateable e2
 isCalculateable (UNIX (_, e)) = isCalculateable e

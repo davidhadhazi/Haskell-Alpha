@@ -44,7 +44,7 @@ genImage :: Gtk.Entry -> IO ()
 genImage ent = do
     txt <- Gtk.entryGetText ent
     let expr = ST.makeSyntax $ T.unpack txt
-    let myPoints = genPoints expr $ map (\x -> (fromIntegral . round $ x * 10) / 10 ) [0.1,0.2..10.0]
+    let myPoints = genPoints expr $ map (\x -> x / 10.0 ) [0..100]
 
     toFile def "src/asd.jpeg" $ do
         setColors [opaque blue]
@@ -65,34 +65,50 @@ main = do
     let cssFile = "src/boxStyle.css"
     Gtk.cssProviderLoadFromPath css cssFile
     
-    box <- new Gtk.Box [#orientation := Gtk.OrientationVertical, #spacing := 10]
-    #add win box
-
+    box <- new Gtk.Box [#orientation := Gtk.OrientationVertical, #spacing := 10, #expand := True]
     ctx <- Gtk.widgetGetStyleContext box
     Gtk.styleContextAddProvider ctx css 800
+    #add win box
+
+    entryBox <- new Gtk.Box [#orientation := Gtk.OrientationHorizontal, #spacing := 5, #expand := False]
+    #setHalign entryBox Gtk.AlignFill
+    #setValign entryBox Gtk.AlignCenter
+    #add box entryBox
+
+    startEndBox <- new Gtk.Box [#orientation := Gtk.OrientationVertical, #spacing := 5]
+    #add entryBox startEndBox
+
+    startEntry <- new Gtk.Entry []
+    #add startEndBox startEntry
+    endEntry <- new Gtk.Entry []
+    #add startEndBox endEntry
 
     entry <- new Gtk.Entry []
-    result <- new Gtk.Entry []
+    Gtk.widgetSetValign entry Gtk.AlignCenter
+    Gtk.boxPackEnd entryBox entry True True 5
 
     buttonGrid <- Gtk.gridNew
     Gtk.gridSetColumnSpacing buttonGrid 10
     Gtk.gridSetColumnHomogeneous buttonGrid True
+    #add box buttonGrid
+
+    derButton <- new Gtk.Button [#label := "derivate"]
+    #add buttonGrid derButton
+    intButton <- new Gtk.Button [#label := "integrate"]
+    #add buttonGrid intButton
+
+    result <- new Gtk.Entry []
+    #add box result
+
+    emptyLabel <- new Gtk.Label []
+    #add box emptyLabel
 
     img <- Gtk.imageNewFromFile ("src/HA.png")
-    
-    derButton <- new Gtk.Button [#label := "derivate"]
-    _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax) img)
-    intButton <- new Gtk.Button [#label := "integrate"]
-    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax) img)
-    _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax) img)
-
-    #add buttonGrid derButton
-    #add buttonGrid intButton
-    
-    #add box entry
-    #add box buttonGrid
-    #add box result
     #add box img
+    
+    _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax) img)
+    _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax) img)
+    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax) img)
 
     #showAll win
     Gtk.main
