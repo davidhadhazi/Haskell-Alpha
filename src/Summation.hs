@@ -9,7 +9,6 @@ summation = summationSimples . summationProd . summationSum
 summationSimples (BINIX (SIMPLE 0, MUL, _)) = SIMPLE 0
 summationSimples (BINIX (SIMPLE 1, MUL, e)) = summation e
 summationSimples (BINIX (e, DIV, SIMPLE 1)) = summation e
-summationSimples (UNIX (t, SIMPLE n)) = SIMPLE (calculate (UNIX (t, SIMPLE n)))
 summationSimples (BINIX (SIMPLE 0, RAI, SIMPLE 0)) = undefined
 summationSimples (BINIX (SIMPLE n, t, SIMPLE m)) = SIMPLE (calculate (BINIX (SIMPLE n, t, SIMPLE m)))
 summationSimples (BINIX (SIMPLE 0, ADD, e)) = summation e
@@ -19,40 +18,45 @@ summationSimples (BINIX (e1, ADD, BINIX (SIMPLE (-1), MUL, e2)))
 summationSimples (BINIX (SIMPLE n, ADD, BINIX (SIMPLE m, ADD, e))) = summation $ BINIX (SIMPLE (n + m), ADD, e)
 summationSimples (BINIX (e1, ADD, BINIX (BINIX (SIMPLE (-1), MUL, e2), ADD, e3))) = summation $ BINIX (BINIX (e1, MIN, e2), ADD, e3)
 summationSimples (BINIX (SIMPLE (-1), MUL, BINIX (SIMPLE n, MUL, e))) = BINIX (SIMPLE (-n), MUL, summation e)
+summationSimples (BINIX (SIMPLE (-1), MUL, UNIX (t, e))) = UNIX (NEG, summation (UNIX (t, e)))
 summationSimples (BINIX (SIMPLE (-1), DIV, BINIX (SIMPLE n, MUL, e))) = BINIX (SIMPLE (1 / n), MUL, summation e)
 summationSimples (BINIX (SIMPLE (-1), DIV, BINIX (SIMPLE n, DIV, e))) = BINIX (SIMPLE (1 / n), DIV, summation e)
-summationSimples (BINIX (SIMPLE (-1), MUL, UNIX (t, e))) = UNIX (NEG, summation (UNIX (t, e)))
 summationSimples (BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE (-1)))) = summation $ BINIX (e1, DIV, e2)
 summationSimples (BINIX (SIMPLE n, MUL, BINIX (SIMPLE m, DIV, e))) = summation $ BINIX (SIMPLE (n * m), DIV, e)
 summationSimples (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
 summationSimples (BINIX (e, RAI, SIMPLE 1)) = summation e
+summationSimples (BINIX (e1, ADD, BINIX (UNIX (NEG, e2), ADD, e3))) = summation $ BINIX (BINIX (e1, MIN, e2), ADD, e3)
+summationSimples (BINIX (e1, ADD, BINIX (UNIX (NEG, e2), MIN, e3))) = summation $ BINIX (BINIX (e1, MIN, e2), MIN, e3)
 summationSimples (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
+summationSimples (UNIX (t, SIMPLE n)) = SIMPLE (calculate (UNIX (t, SIMPLE n)))
 summationSimples (UNIX (t, e)) = UNIX (t, summation e)
 summationSimples e = e
 
 summationSum (BINIX (e1, ADD, e2))
- | e1 == e2 = summation $ BINIX (SIMPLE 2, MUL, e1)         -- e + e = 2e
+ | e1 == e2 = summation $ BINIX (SIMPLE 2, MUL, e1)
+summationSum (BINIX (e1, ADD, BINIX (SIMPLE a, MUL, e2)))
+ | e1 == e2 = summation $ BINIX (SIMPLE (a + 1), MUL, e1)
+summationSum (BINIX (BINIX (SIMPLE a, MUL, e1), ADD, BINIX (SIMPLE b, MUL, e2)))
+ | e1 == e2 = summation $ BINIX (SIMPLE (a + b), MUL, e1)
+--------------------------------------------------------------------------
+summationSum (BINIX (BINIX (SIMPLE a, MUL, e1), ADD, BINIX (BINIX (SIMPLE b, MUL, e2), ADD, f)))
+ | e1 == e2 = summation $ BINIX (BINIX (SIMPLE (a + b), MUL, e1), ADD, f)
+summationSum (BINIX (e1, ADD, BINIX (BINIX (SIMPLE a, MUL, e2), ADD, f)))
+ | e1 == e2 = summation $ BINIX (BINIX (SIMPLE (a + 1), MUL, e1), ADD, f)
 summationSum (BINIX (e1, ADD, BINIX (e2, ADD, f)))
- | e1 == e2 = summation $ BINIX (BINIX (SIMPLE 2, MUL, e1), ADD, f)     -- e + (e + f) = 2e + f
-summationSum (BINIX (e1, ADD, BINIX (SIMPLE n, MUL, e2))) 
- | e1 == e2 = summation $ BINIX (SIMPLE (n + 1), MUL, e1)        -- e + ne = (n + 1)e
-summationSum (BINIX (e1, ADD, BINIX (BINIX (SIMPLE n, MUL, e2), ADD, f)))
- | e1 == e2 = summation $ BINIX (BINIX (SIMPLE (n + 1), MUL, e1), ADD, f)      -- e + (ne + f) = (n + 1)e + f
-summationSum (BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE m, MUL, e2)))
- | e1 == e2 = BINIX (SIMPLE (n + m), MUL, e1)     -- ne + me = (n + m)e
-summationSum (BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (BINIX (SIMPLE m, MUL, e2), ADD, f)))        -- ne + (me + f) = (n + m)e + f
- | e1 == e2 = summation $ BINIX (BINIX (SIMPLE (n + m), MUL, e1), ADD, f)
-summationSum (BINIX (e1, ADD, UNIX (NEG, e2))) = summation $ BINIX (e1, MIN, e2)
---------------------------------------------------------------------------------------------------
+ | e1 == e2 = summation $ BINIX (BINIX (SIMPLE 2, MUL, e1), ADD, f)
+--------------------------------------------------------------------------
 summationSum (BINIX (BINIX (UNIX (SIN, e1), RAI, SIMPLE 2), ADD, BINIX (UNIX (COS, e2), RAI, SIMPLE 2)))
  | e1 == e2 = SIMPLE 1
-summationSum (BINIX (BINIX (SIMPLE n, MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (SIMPLE m, MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))))
- | e1 == e2 && n < 0 = BINIX (SIMPLE 1, ADD, BINIX (BINIX (SIMPLE (n + 1), MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (SIMPLE (m + 1), MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))))
- | e1 == e2 && n > 0 = BINIX (SIMPLE 1, ADD, BINIX (BINIX (SIMPLE (n - 1), MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (SIMPLE (m - 1), MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))))
---------------------------------------------------------------------------------------------------
-summationSum (BINIX (e1, ADD, BINIX (e2, ADD, e3)))
- | e1 == e2 = summation (BINIX (BINIX (SIMPLE 2, MUL, e1), ADD, e3))
-summationSum (BINIX (e1, ADD, BINIX (BINIX (SIMPLE (-1), MUL, e2), ADD, e3))) = summation $ BINIX (BINIX (e1, MIN, e2), ADD, e3)
+summationSum (BINIX (BINIX (SIMPLE a, MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (UNIX (COS, e2), RAI, SIMPLE 2)))
+ | e1 == e2 = summation $ BINIX (SIMPLE 1, ADD, BINIX (SIMPLE (a - 1), MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)))
+summationSum (BINIX (BINIX (UNIX (SIN, e1), RAI, SIMPLE 2), ADD, BINIX (SIMPLE b, MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))))
+ | e1 == e2 = summation $ BINIX (SIMPLE 1, ADD, BINIX (SIMPLE (b - 1), MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2)))
+summationSum (BINIX (BINIX (SIMPLE a, MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (SIMPLE b, MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))))
+ | e1 == e2 && a == b = SIMPLE a
+ | e1 == e2 && a < b  = summation $ BINIX (BINIX (UNIX (SIN, e1), RAI, SIMPLE 2), ADD, BINIX (SIMPLE (b - a), MUL, BINIX (UNIX (COS, e2), RAI, SIMPLE 2)))
+ | e1 == e2 && a > b  = summation $ BINIX (BINIX (SIMPLE (a - b), MUL, BINIX (UNIX (SIN, e1), RAI, SIMPLE 2)), ADD, BINIX (UNIX (COS, e2), RAI, SIMPLE 2))
+--------------------------------------------------------------------------
 summationSum (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
 summationSum (UNIX (t, e)) = UNIX (t, summation e)
 summationSum (VAR x) = VAR x

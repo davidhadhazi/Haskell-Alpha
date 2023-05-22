@@ -75,7 +75,31 @@ simplifyings = TestList [
                     TestCase (assertEqual "6x^2 + x + 2x^7 = x + (6 * x^2 + 2 * x^7)" (simplifying (makeSyntax "6x^2 + x + 2x^7")) (makeSyntax "x + (6 * x^2 + 2 * x^7)")),
                     TestCase (assertEqual "2 + 3x + 9x^2 = 2 + (3 * x + 9 * x^2)" (simplifying (makeSyntax "2 + 3x + 9x^2")) (makeSyntax "2 + (3 * x + 9 * x^2)")),
                     TestCase (assertEqual "sin x + 2 = 2 + sin x" (simplifying (makeSyntax "sin x + 2")) (makeSyntax "2 + sin x")),
-                    TestCase (assertEqual "2 + sin x = 2 + sin x" (simplifying (makeSyntax "2 + sin x")) (makeSyntax "2 + sin x"))
+                    TestCase (assertEqual "2 + sin x = 2 + sin x" (simplifying (makeSyntax "2 + sin x")) (makeSyntax "2 + sin x")),
+                    TestCase (assertEqual "x + x = 2x" (simplifying (makeSyntax "x + x")) (makeSyntax "2x")),
+                    TestCase (assertEqual "2x + x = 3x" (simplifying (makeSyntax "2x + x")) (makeSyntax "3x")),
+                    TestCase (assertEqual "2x + 3x = 5x" (simplifying (makeSyntax "2x + 3x")) (makeSyntax "5x")),
+                    TestCase (assertEqual "x - x = 0" (simplifying (makeSyntax "x - x")) (makeSyntax "0")),
+                    TestCase (assertEqual "x^2 + 2*x^2 = 3 * x^2" (simplifying (makeSyntax "x^2 + 2*x^2")) (makeSyntax "3 * x^2")),
+                    TestCase (assertEqual "5*ln x + ln x = 6 *ln x" (simplifying (makeSyntax "5*ln x + ln x")) (makeSyntax "6 * ln x")),
+                    TestCase (assertEqual "-x-x = -2 * x" (simplifying (makeSyntax "-x-x")) (simplifying (makeSyntax "(-2) * x"))),
+                    TestCase (assertEqual "sin (x + x) = sin (2x)" (simplifying (makeSyntax "sin (x + x)")) (makeSyntax "sin (2x)")),
+                    TestCase (assertEqual "1 + x + x = 1 + 2x" (simplifying (makeSyntax "1 + x + x")) (makeSyntax "1 + 2x")),
+                    TestCase (assertEqual "x + x + sin x = 2x + sinx" (simplifying (makeSyntax "x + x + sin x")) (makeSyntax "2x + sin x")),
+                    TestCase (assertEqual "x + sin x + x = 2x + sinx" (simplifying (makeSyntax "x + sin x + x")) (makeSyntax "2x + sin x")),
+                    TestCase (assertEqual "sin x + x + x = 2x + sinx" (simplifying (makeSyntax "sin x + x + x")) (makeSyntax "2x + sin x")),
+                    TestCase (assertEqual "sin x + x + 2x = 2x + sinx" (simplifying (makeSyntax "sin x + x + 2x")) (makeSyntax "3x + sin x")),
+                    TestCase (assertEqual "11x + cos x + 9x = 20x + cos x" (simplifying (makeSyntax "11x + cos x + 9x")) (makeSyntax "20x + cos x")),
+                    TestCase (assertEqual "11x + 5 * cos x + 9x = 20x + cos x" (simplifying (makeSyntax "11x + 5 * cos x + 9x")) (makeSyntax "20x + 5 *cos x")),
+                    TestCase (assertEqual "6x - 5x = x" (simplifying (makeSyntax "6x - 5x")) (makeSyntax "x")),
+                    TestCase (assertEqual "log x + 6x - 5x = x" (simplifying (makeSyntax "log x + 6x - 5x")) (makeSyntax "x + log x")),
+                    TestCase (assertEqual "6x + 3 - 5x = x" (simplifying (makeSyntax "6x + 3 - 5x")) (makeSyntax "3 + x")),
+                    TestCase (assertEqual "log x + 5x - 6x = x" (simplifying (makeSyntax "log x + 5x - 6x")) (makeSyntax "-x + log x")),
+                    TestCase (assertEqual "-6x + 3 + 5x = x" (simplifying (makeSyntax "-6x + 3 + 5x")) (makeSyntax "3 - x")),
+                    TestCase (assertEqual "sin x^2 + cos x^2 = 1" (simplifying (makeSyntax "sin x^2 + cos x^2")) (makeSyntax "1")),
+                    TestCase (assertEqual "2 * sin x^2 + cos x^2 = 1 + sin x^2" (simplifying (makeSyntax "2 * sin x^2 + cos x^2")) (makeSyntax "1 + sin x^2")),
+                    TestCase (assertEqual "sin x^2 + 4 * cos x^2 = 1 + 3 * cos x^2" (simplifying (makeSyntax "sin x^2 + 4 * cos x^2")) (makeSyntax "1 + 3 * cos x^2")),
+                    TestCase (assertEqual "4 * cos x^2 + 4 * sin x^2 = 4" (simplifying (makeSyntax "4 * cos x^2 + 4 * sin x^2")) (makeSyntax "4"))
                 ]
 
 derivates :: Test
@@ -87,11 +111,13 @@ derivates = TestList [
                     TestCase (assertEqual "(x+1)^2' = 2 + 2x" (simplifying (derivate (makeSyntax "(x+1)^2"))) (makeSyntax "2 + 2x")),
                     TestCase (assertEqual "(x+1)^7' = 7 * (1 + x)^6" (simplifying (derivate (makeSyntax "(x+1)^7"))) (makeSyntax "7 * (1 + x)^6")),
                     TestCase (assertEqual "(x-1)^7' = 7 * (-1 + x)^6" (simplifying (derivate (makeSyntax "(x-1)^7"))) (simplifying (makeSyntax "7 * (-1 + x)^6"))),
+                    TestCase (assertEqual "1/x' = -1/x^2" (simplifying (derivate (makeSyntax "1/x"))) (simplifying (makeSyntax "(-1)/x^2"))),
+                    TestCase (assertEqual "-1/x' = 1/x^2" (simplifying (derivate (makeSyntax "-1/x"))) (makeSyntax "1/x^2")),
                     TestCase (assertEqual "sin x' = cos x" (simplifying (derivate (makeSyntax "sin x"))) (makeSyntax "cos x")),
                     TestCase (assertEqual "cos x' = -sin x" (simplifying (derivate (makeSyntax "cos x"))) (makeSyntax "-sin x")),
                     TestCase (assertEqual "sin x + 1' = cos x" (simplifying (derivate (makeSyntax "sin x + 1"))) (makeSyntax "cos x")),
                     TestCase (assertEqual "tan x' = 1 / (cos x)^2" (simplifying (derivate (makeSyntax "tan x"))) (makeSyntax "1 / (cos x)^2")),
-                    TestCase (assertEqual "ctg x' = 1 / (sin x)^2" (simplifying (derivate (makeSyntax "ctg x"))) (makeSyntax "1 / (sin x)^2")),
+                    TestCase (assertEqual "ctg x' = -1 / (sin x)^2" (simplifying (derivate (makeSyntax "ctg x"))) (simplifying (makeSyntax "-1 / (sin x)^2"))),
                     TestCase (assertEqual "e^x' = e^x" (simplifying (derivate (makeSyntax "e^x"))) (makeSyntax "e^x")),
                     TestCase (assertEqual "6^x' = ln 6 * 6^x" (simplifying (derivate (makeSyntax "6^x"))) (simplifying (makeSyntax "ln 6 * 6^x")))
                     ]

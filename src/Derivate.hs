@@ -11,7 +11,6 @@ derivate (BINIX (e1, ADD, e2)) = makeSyntax $ show (derivate e1) ++ "+" ++ show 
 derivate (BINIX (e1, MIN, e2)) = makeSyntax $ show (derivate e1) ++ "-" ++ show (derivate e2)
 derivate (BINIX (e1, MUL, e2)) = makeSyntax $ show (derivate e1) ++ "*" ++ show e2 ++ "+" ++ show e1 ++ "*" ++ show (derivate e2)
 derivate (BINIX (e1, DIV, e2)) = 
-    -- BINIX (BINIX (BINIX (derivate e1, MUL, e2), MIN, BINIX (e2, MUL, derivate e1)), DIV, BINIX (e2, RAI, SIMPLE 2))
     makeSyntax $ "(" ++ show (derivate e1) ++ "*" ++ show e2 ++ "-" ++ show e1 ++ "*" ++ show (derivate e2) ++ ")/" ++
                                                show e2 ++ "^2"
 derivate (BINIX (e1, RAI, e2)) = BINIX (BINIX (e1, RAI, e2), MUL,

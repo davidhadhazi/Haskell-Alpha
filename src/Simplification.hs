@@ -57,6 +57,8 @@ rebracketing e = e
 negation :: Expression -> Expression
 negation (BINIX (e1, ADD, UNIX (NEG, e2))) = negation $ BINIX (e1, MIN, e2)
 negation (BINIX (e1, t, e2)) = BINIX (negation e1, t, negation e2)
+negation (UNIX (NEG, BINIX (e1, MUL, e2))) = negation $ BINIX (UNIX (NEG, e1), MUL, e2)
+negation (UNIX (NEG, BINIX (e1, DIV, e2))) = negation $ BINIX (UNIX (NEG, e1), DIV, e2)
 negation (UNIX (t, e)) = UNIX (t, negation e)
 negation e = e
 

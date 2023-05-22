@@ -30,6 +30,12 @@ data Expression
   | UNIX   (Token, Expression)
   | BINIX  (Expression, Token, Expression)
 
+instance Show Expression where
+  show (SIMPLE x) = show x
+  show (VAR x)    = x : []
+  show (UNIX (t, expr)) = show t ++ "(" ++ show expr ++ ")"
+  show (BINIX (e1, t, e2)) = "(" ++ show e1 ++ " " ++ show t ++ " " ++ show e2 ++ ")"
+
 instance Eq Expression where
   (==) (SIMPLE n) (SIMPLE m) = n == m
   (==) (VAR x) (VAR y) = x == y
@@ -37,11 +43,24 @@ instance Eq Expression where
   (==) (BINIX (a1, t1, b1)) (BINIX (a2, t2, b2)) = t1 == t2 && a1 == a2 && b1 == b2
   (==) _ _ = False
 
-instance Show Expression where
-  show (SIMPLE x) = show x
-  show (VAR x)    = x : []
-  show (UNIX (t, expr)) = show t ++ "(" ++ show expr ++ ")"
-  show (BINIX (e1, t, e2)) = "(" ++ show e1 ++ " " ++ show t ++ " " ++ show e2 ++ ")"
+instance Ord Expression where
+  compare (SIMPLE n) (SIMPLE m) = compare n m
+  compare (SIMPLE _) _ = LT
+  compare _ (SIMPLE _) = GT
+  compare (VAR x) (VAR y) = compare x y
+  compare (VAR _) _ = LT
+  compare _ (VAR _) = GT
+  compare (UNIX (t1, e1)) (UNIX (t2, e2))
+    | t1 == t2 = compare e1 e2
+    |otherwise = compare t1 t2
+  compare (UNIX _) _ = LT
+  compare _ (UNIX _) = GT
+  compare (BINIX (SIMPLE _, MUL, e1)) e2 = compare e1 e2
+  compare e1 (BINIX (SIMPLE _, MUL, e2)) = compare e1 e2
+  compare (BINIX (e1, RAI, SIMPLE n)) (BINIX (e2, RAI, SIMPLE m))
+    | e1 == e2 = compare n m 
+    |otherwise = compare e1 e2
+  compare (BINIX (_, t1, _)) (BINIX (_, t2, _)) = compare t2 t1
 
 replace :: Double -> Expression -> Expression
 replace n (VAR _) = SIMPLE (Creal (realToFrac n))
@@ -90,6 +109,7 @@ isCalculateable (UNIX (CTG, e)) = isCalculateable e && (Creal 0) /= calculate (U
 isCalculateable (BINIX (e1, _, e2)) = isCalculateable e1 && isCalculateable e2
 isCalculateable (UNIX (_, e)) = isCalculateable e
 isCalculateable (SIMPLE _) = True
+isCalculateable (VAR _) = False
 
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
