@@ -10,6 +10,7 @@ unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX
 unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e
 unbracketing (UNIX (NEG, SIMPLE n)) = SIMPLE (-n)
 unbracketing (UNIX (NEG, e)) = BINIX (SIMPLE (-1), MUL, unbracketing e)
+unbracketing (BINIX (e1, MIN, BINIX (SIMPLE a, MUL, e2))) = unbracketing $ BINIX (e1, ADD, BINIX (SIMPLE (negate a), MUL, e2))
 unbracketing (BINIX (e1, MIN, e2)) = BINIX (unbracketing e1, ADD, BINIX (SIMPLE (-1), MUL, unbracketing e2))
 -----------------------------------------------------
 unbracketing (UNIX (LN, BINIX (exp1, RAI, exp2))) = BINIX (unbracketing exp2, MUL, UNIX (LN, unbracketing exp1))        --      ln (a^b) = b * ln a
@@ -36,8 +37,7 @@ unbracketing (BINIX (n, LOG, BINIX (UNIX (NEG, exp1), DIV, UNIX (NEG, exp2)))) =
  BINIX (BINIX (n, LOG, unbracketing exp1), MIN, BINIX (n, LOG, unbracketing exp2))
 unbracketing (BINIX (n, LOG, BINIX (exp1, DIV, exp2))) = BINIX (BINIX (n, LOG, unbracketing exp1), MIN, BINIX (n, LOG, unbracketing exp2))
 -----------------------------------------------------
-unbracketing (BINIX (e, RAI, (SIMPLE n)))
- | n < 0 = BINIX (SIMPLE 1, DIV, BINIX (e, RAI, SIMPLE (negate n)))
+unbracketing (BINIX (e1, DIV, e2)) = unbracketing $ BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE (-1)))
 -----------------------------------------------------
 unbracketing (BINIX (e1, t, e2)) = BINIX (unbracketing e1, t, unbracketing e2)
 unbracketing (UNIX (t, e)) = UNIX (t, unbracketing e)
@@ -55,10 +55,22 @@ rebracketing (BINIX (e1, MUL, BINIX (e2, MUL, e3))) = BINIX (e1, MUL, rebracketi
 rebracketing e = e
 
 negation :: Expression -> Expression
-negation (BINIX (e1, ADD, UNIX (NEG, e2))) = negation $ BINIX (e1, MIN, e2)
+negation (BINIX (e1, ADD, BINIX (SIMPLE (-1), MUL, e2))) = negation $ BINIX (e1, MIN, e2)
+negation (BINIX (e1, ADD, BINIX (SIMPLE a, MUL, e2)))
+ | a < 0 = negation $ BINIX (e1, MIN, BINIX (SIMPLE (negate a), MUL, e2))
+negation (BINIX (e1, ADD, BINIX (BINIX (SIMPLE (-1), MUL, e2), ADD, e3))) = negation $ BINIX (BINIX (e1, MIN, e2), ADD, e3)
+negation (BINIX (e1, ADD, BINIX (BINIX (SIMPLE a, MUL, e2), ADD, e3)))
+ | a < 0 = negation $ BINIX (BINIX (e1, MIN, BINIX (SIMPLE (negate a), MUL, e2)), ADD, e3)
+------------------------------------------------------------------------------
+negation (BINIX (e, RAI, SIMPLE (-1))) = negation $ BINIX (SIMPLE 1, DIV, e)
+negation (BINIX (e, RAI, SIMPLE n))
+ | n < 0 = negation $ BINIX (SIMPLE 1, DIV, BINIX (e, RAI, SIMPLE (negate n)))
+negation (BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE n)))
+ | n < 0 = negation $ BINIX (e1, DIV, BINIX (e2, RAI, SIMPLE (negate n)))
+-------------------------------------------------------------------------------
+negation (BINIX (SIMPLE (-1), MUL, e)) = negation $ UNIX (NEG, e)
+-------------------------------------------------------------------
 negation (BINIX (e1, t, e2)) = BINIX (negation e1, t, negation e2)
-negation (UNIX (NEG, BINIX (e1, MUL, e2))) = negation $ BINIX (UNIX (NEG, e1), MUL, e2)
-negation (UNIX (NEG, BINIX (e1, DIV, e2))) = negation $ BINIX (UNIX (NEG, e1), DIV, e2)
 negation (UNIX (t, e)) = UNIX (t, negation e)
 negation e = e
 

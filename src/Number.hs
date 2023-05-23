@@ -34,7 +34,7 @@ instance Eq Number' where
   (==) (Frac (n1,d1)) (Frac (n2,d2)) = (numerator (n1 % d1) == numerator (n2 % d2)) && denominator (n1 % d1) == denominator (n2 % d2)
   (==) (Frac   (n,d)) (Integer    i) = (numerator (n % d) == i) && (denominator (n % d) == 1)
   (==) (Integer    i) (Frac   (n,d)) = (numerator (n % d) == i) && (denominator (n % d) == 1)
-  (==)            _             _  = False
+  (==)           n1              n2  = (show n1) == (show n2)
 
 instance Ord Number' where
   compare (Integer i1) (Integer i2) = compare i1 i2

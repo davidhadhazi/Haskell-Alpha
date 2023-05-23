@@ -92,6 +92,8 @@ simplifyings = TestList [
                     TestCase (assertEqual "11x + cos x + 9x = 20x + cos x" (simplifying (makeSyntax "11x + cos x + 9x")) (makeSyntax "20x + cos x")),
                     TestCase (assertEqual "11x + 5 * cos x + 9x = 20x + cos x" (simplifying (makeSyntax "11x + 5 * cos x + 9x")) (makeSyntax "20x + 5 *cos x")),
                     TestCase (assertEqual "6x - 5x = x" (simplifying (makeSyntax "6x - 5x")) (makeSyntax "x")),
+                    TestCase (assertEqual "2 * x * x = 2 * x^2" (simplifying (makeSyntax "2 * x * x")) (makeSyntax "2 * x^2")),
+                    TestCase (assertEqual "log x * x * 2x = 2 * x^2 * log x" (simplifying (makeSyntax "log x * x * 2x")) (makeSyntax "2 * (log x * x^2)")),
                     TestCase (assertEqual "log x + 6x - 5x = x" (simplifying (makeSyntax "log x + 6x - 5x")) (makeSyntax "x + log x")),
                     TestCase (assertEqual "6x + 3 - 5x = x" (simplifying (makeSyntax "6x + 3 - 5x")) (makeSyntax "3 + x")),
                     TestCase (assertEqual "log x + 5x - 6x = x" (simplifying (makeSyntax "log x + 5x - 6x")) (makeSyntax "-x + log x")),
@@ -113,13 +115,17 @@ derivates = TestList [
                     TestCase (assertEqual "(x-1)^7' = 7 * (-1 + x)^6" (simplifying (derivate (makeSyntax "(x-1)^7"))) (simplifying (makeSyntax "7 * (-1 + x)^6"))),
                     TestCase (assertEqual "1/x' = -1/x^2" (simplifying (derivate (makeSyntax "1/x"))) (simplifying (makeSyntax "(-1)/x^2"))),
                     TestCase (assertEqual "-1/x' = 1/x^2" (simplifying (derivate (makeSyntax "-1/x"))) (makeSyntax "1/x^2")),
+                    TestCase (assertEqual "5/x^2' = -10/x^3" (simplifying (derivate (makeSyntax "5/x^2"))) (simplifying (makeSyntax "-10/x^3"))),
+                    TestCase (assertEqual "-4/x^4' = 16/x^5" (simplifying (derivate (makeSyntax "-4/x^4"))) (makeSyntax "16/x^5")),
                     TestCase (assertEqual "sin x' = cos x" (simplifying (derivate (makeSyntax "sin x"))) (makeSyntax "cos x")),
                     TestCase (assertEqual "cos x' = -sin x" (simplifying (derivate (makeSyntax "cos x"))) (makeSyntax "-sin x")),
                     TestCase (assertEqual "sin x + 1' = cos x" (simplifying (derivate (makeSyntax "sin x + 1"))) (makeSyntax "cos x")),
                     TestCase (assertEqual "tan x' = 1 / (cos x)^2" (simplifying (derivate (makeSyntax "tan x"))) (makeSyntax "1 / (cos x)^2")),
                     TestCase (assertEqual "ctg x' = -1 / (sin x)^2" (simplifying (derivate (makeSyntax "ctg x"))) (simplifying (makeSyntax "-1 / (sin x)^2"))),
                     TestCase (assertEqual "e^x' = e^x" (simplifying (derivate (makeSyntax "e^x"))) (makeSyntax "e^x")),
-                    TestCase (assertEqual "6^x' = ln 6 * 6^x" (simplifying (derivate (makeSyntax "6^x"))) (simplifying (makeSyntax "ln 6 * 6^x")))
+                    TestCase (assertEqual "6^x' = ln 6 * 6^x" (simplifying (derivate (makeSyntax "6^x"))) (simplifying (makeSyntax "ln 6 * 6^x"))),
+
+                    TestCase (assertEqual "x^x' = x^x * (1 + ln x)" (simplifying (derivate (makeSyntax "x^x"))) (makeSyntax "x^x * (1 + ln x)"))
                     ]
 
 indefinite_integrates :: Test
@@ -140,6 +146,9 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x+1"))) (makeSyntax "x-x^2-x^5")),
                                 TestCase (assertEqual "integrate_5x^4-2x+1" (simplifying (integrate (makeSyntax "-5x^4-2x-1"))) (simplifying (makeSyntax "-x-x^2-x^5"))),
                                 TestCase (assertEqual "integrate_e^x" (simplifying (integrate (makeSyntax "e^x"))) (makeSyntax "e^x")),
+                                TestCase (assertEqual "integrate_1/x" (simplifying (integrate (makeSyntax "1/x"))) (makeSyntax "ln x")),
+                                TestCase (assertEqual "integrate_1/x^2" (simplifying (integrate (makeSyntax "1/x^2"))) (simplifying (makeSyntax "(-1)/x"))),
+                                TestCase (assertEqual "integrate_8/x^5" (simplifying (integrate (makeSyntax "8/x^5"))) (simplifying (makeSyntax "(-2)/x^4"))),
                                 TestCase (assertEqual "integrate_sinx" (simplifying (integrate (makeSyntax "sin x"))) (simplifying (makeSyntax "-cos x"))),
                                 TestCase (assertEqual "integrate_cosx" (simplifying (integrate (makeSyntax "cos x"))) (simplifying (makeSyntax "sin x"))),
                                 TestCase (assertEqual "integrate_tanx" (simplifying (integrate (simplifying (makeSyntax "tan x")))) (simplifying (makeSyntax "-ln(cos x)"))),
@@ -157,7 +166,9 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_xsinx" (simplifying (integrate (makeSyntax "x * sin x"))) (simplifying (makeSyntax "sin x - x * cos x"))),
                                 TestCase (assertEqual "integrate_sinx * x" (simplifying (integrate (simplifying (makeSyntax "sin x * x")))) (simplifying (makeSyntax "sin x - x * cos x"))),
                                 TestCase (assertEqual "integrate_xcosx" (simplifying (integrate (makeSyntax "x * cos x"))) (simplifying (makeSyntax "x * sin x + cos x"))),
-                                TestCase (assertEqual "integrate_cosx * x" (simplifying (integrate (simplifying (makeSyntax "cos x * x")))) (simplifying (makeSyntax "cos x + x * sin x")))
+                                TestCase (assertEqual "integrate_cosx * x" (simplifying (integrate (simplifying (makeSyntax "cos x * x")))) (simplifying (makeSyntax "cos x + x * sin x"))),
+
+                                TestCase (assertEqual "integrate_x^x * (1 + ln x)" (simplifying (integrate (simplifying (makeSyntax "x^x * (1 + ln x)")))) (makeSyntax "x^x"))
                                 ]
 
 tests :: Test
