@@ -1,4 +1,4 @@
-module Summation (summation, summationSum) where
+module Summation (summation) where
 
 import Tokens
 import SyntaxTree

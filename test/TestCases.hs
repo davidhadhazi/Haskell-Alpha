@@ -14,7 +14,7 @@ tokens = TestList[
                   TestCase (assertEqual "1 1" (stringToTokens "1 1") [PURE 1, PURE 1]),
                   TestCase (assertEqual "1              1 = 1 1" (stringToTokens "1                1") [PURE 1, PURE 1]), 
                   TestCase (assertEqual "123" (stringToTokens "123") [PURE 123]),
-                  TestCase (assertEqual "1.2" (stringToTokens "1.2") [PURE 1, ADD, NUM (Creal 0.2)]),
+                  TestCase (assertEqual "1.2" (stringToTokens "1.2") [PURE 1, DOT, NUM (Creal 0.2)]),
                   TestCase (assertEqual "pi" (stringToTokens "pi") [PI]),
                   TestCase (assertEqual "e" (stringToTokens "e") [E]),
                   TestCase (assertEqual "+" (stringToTokens "+") [ADD]),
@@ -44,7 +44,7 @@ syntaxes = TestList[
                     TestCase (assertEqual "1 + (2 + 3)" (makeSyntax "1 + (2 + 3)") (BINIX (SIMPLE 1, ADD, BINIX (SIMPLE 2, ADD, SIMPLE 3)))),
                     TestCase (assertEqual "cos (x^2)" (makeSyntax "cos (x^2)") (UNIX (COS, BINIX (VAR 'x', RAI, SIMPLE 2)))),
                     TestCase (assertEqual "log_2 4 + ln 3 * log 5" (makeSyntax "log_2 4 + ln 3 * log 5") (BINIX (BINIX (SIMPLE 2, LOG, SIMPLE 4), ADD, BINIX (UNIX (LN, SIMPLE 3), MUL, UNIX (LOG10, SIMPLE 5))))),
-                    TestCase (assertEqual "tan x y" (makeSyntax "tan x y") (BINIX (UNIX (TAN, VAR 'x'), MUL, VAR 'y'))),
+                    TestCase (assertEqual "tan x" (makeSyntax "tan x") (UNIX (TAN, VAR 'x'))),
                     TestCase (assertEqual "ctg e" (makeSyntax "ctg e") (UNIX (CTG, SIMPLE (exp 1))))
                     ]
 

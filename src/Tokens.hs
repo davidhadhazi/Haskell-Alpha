@@ -63,16 +63,11 @@ isOperator PI = False
 isOperator CL = False
 isOperator _ = True
 
-makeEnd :: CReal -> CReal
-makeEnd dl
- | dl < 1   = dl
- |otherwise = makeEnd $ dl / 10
-
 fillingUp :: [Token] -> [Token]
 fillingUp [] = []
 fillingUp ((PURE n):(PARAM p):ts) = NUM (Integer n) : MUL : fillingUp (PARAM p:ts)
 fillingUp ((PARAM p1):(PARAM p2):ts) = PARAM p1 : MUL : fillingUp (PARAM p2:ts)
-fillingUp ((PURE n1):DOT:(PURE n2):ts) = NUM (Creal (fromIntegral n1 + makeEnd (fromIntegral n2))) : fillingUp ts
+fillingUp ((PURE p):DOT:(NUM (Creal c)):ts) = (NUM (Creal (fromInteger p + c))) : fillingUp ts
 fillingUp ((PURE n):ts) = NUM (Integer n) : fillingUp ts
 fillingUp (LOG :(PURE n):ts) = NUM (Integer n) : LOG : fillingUp ts
 fillingUp (LOG : OP : ts) = [OP] ++ fillingUp (takeColumns 0 ts) ++ [CL] ++ [LOG] ++ fillingUp (dropColumns 0 ts)
@@ -107,7 +102,7 @@ stringToTokens (')':            s) = CL    : stringToTokens s
 stringToTokens ('.':            s) = ts where
     digits = takeWhile isDigit s
     n = NUM $ (Creal (read digits / (10 ^ (length digits)) :: CReal))
-    ts = ADD : n : stringToTokens (dropWhile isDigit s)
+    ts = DOT : n : stringToTokens (dropWhile isDigit s)
 stringToTokens ('p':'i':        s) = PI    : stringToTokens s
 stringToTokens ('e':            s) = E     : stringToTokens s
 stringToTokens (' ':            s) =         stringToTokens s
