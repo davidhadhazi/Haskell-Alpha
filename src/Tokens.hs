@@ -118,7 +118,7 @@ stringToTokens ('s':'i':'n':    s) = SIN   : stringToTokens s
 stringToTokens ('c':'o':'s':    s) = COS   : stringToTokens s
 stringToTokens ('t':'a':'n':    s) = TAN   : stringToTokens s
 stringToTokens ('c':'t':'g':    s) = CTG   : stringToTokens s
+stringToTokens ('x':            s) = PARAM 'x' : stringToTokens s
 stringToTokens (x:xs)
  | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
- | isLetter x = PARAM x : stringToTokens xs
 stringToTokens _ = undefined

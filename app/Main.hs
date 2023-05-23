@@ -20,6 +20,12 @@ import Graphics.Rendering.Chart.Backend.Cairo
 import Control.Exception
 import Graphics.Rendering.Chart.Easy
 import Data.List.Split
+import Text.Read
+
+onError :: Gtk.Entry -> Gtk.Image -> IO ()
+onError entry img = do
+    Gtk.entrySetText entry "Error"
+    Gtk.imageSetFromFile img (Just "src/HA.png")
 
 eval :: Gtk.Entry -> Gtk.Entry -> (String -> String) -> Gtk.Image -> IO ()
 eval ent1 ent2 f img = do
@@ -27,14 +33,10 @@ eval ent1 ent2 f img = do
     result <- try (Gtk.entrySetText ent2 (T.pack (f (T.unpack txt)))) :: IO (Either SomeException ())
     case result of
         Left _ -> do
-            Gtk.entrySetText ent2 $ T.pack "Error"
-            Gtk.imageSetFromFile img (Just "src/HA.png")
-            return ()
+            onError ent2 img
         Right _ -> do
             genImage ent2
             Gtk.imageSetFromFile img (Just "src/asd.jpeg")            
-            return ()
-    return ()
 
 genPoints :: ST.Expression -> [Double] -> [[(Double, Double)]]
 genPoints expr s = map (\l -> map (\d -> (d, N.toDouble (ST.calculate (ST.replace d expr)))) l) 
@@ -51,6 +53,21 @@ genImage ent = do
         plot (line "" myPoints)
         return ()
 
+onIntClicked :: Gtk.Entry -> Gtk.Entry -> Gtk.Entry -> Gtk.Entry -> Gtk.Image -> IO ()
+onIntClicked startEntry endEntry exprEntry resultEntry img = do
+    startTxt <- Gtk.entryGetText startEntry
+    endTxt <- Gtk.entryGetText endEntry
+
+    let startStr = T.unpack startTxt
+    let endStr = T.unpack endTxt
+
+    if startStr == "" && endStr == "" then
+        (eval exprEntry resultEntry (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax) img) else
+            do
+                let (start, end) = (readMaybe startStr :: Maybe Double, readMaybe endStr :: Maybe Double)
+                case (start, end) of
+                    (Just st, Just en) -> eval exprEntry resultEntry (\str -> show (IN.definite_integrate (ST.makeSyntax str) st en)) img
+                    _ -> onError resultEntry img
 
 main :: IO()
 main = do
@@ -108,7 +125,7 @@ main = do
     
     _ <- on entry #activate (eval entry result (show . SM.simplifying . ST.makeSyntax) img)
     _ <- on derButton #clicked (eval entry result (show . SM.simplifying . DV.derivate . ST.makeSyntax) img)
-    _ <- on intButton #clicked (eval entry result (show . SM.simplifying . IN.integrate . SM.simplifying . ST.makeSyntax) img)
+    _ <- on intButton #clicked (onIntClicked startEntry endEntry entry result img)
 
     #showAll win
     Gtk.main

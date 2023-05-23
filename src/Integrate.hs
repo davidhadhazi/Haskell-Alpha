@@ -1,4 +1,4 @@
-module Integrate (integrate) where
+module Integrate (integrate, definite_integrate) where
 
 import SyntaxTree
 import Tokens
@@ -106,3 +106,6 @@ partial_integration f g' = e where
   e 
    | g' == f' && f == g = BINIX (simplifying (BINIX (f, MUL, g)), DIV, SIMPLE 2)
    |otherwise = BINIX (simplifying (BINIX (f, MUL, g)), MIN, (integrate (simplifying (BINIX (f', MUL, g)))))
+
+definite_integrate :: Expression -> Double -> Double -> Double
+definite_integrate expr start end = (toDouble (calculate (replace end (integrate expr)))) - (toDouble (calculate (replace start (integrate expr))))

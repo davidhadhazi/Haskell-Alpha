@@ -171,6 +171,16 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_x^x * (1 + ln x)" (simplifying (integrate (simplifying (makeSyntax "x^x * (1 + ln x)")))) (makeSyntax "x^x"))
                                 ]
 
+definite_integrates :: Test
+definite_integrates = TestList[
+                        TestCase (assertEqual "1_0_1 = 1" (definite_integrate (makeSyntax "1") 0 1) 1),
+                        TestCase (assertEqual "1_1_0 = -1" (definite_integrate (makeSyntax "1") 1 0) (-1)),
+                        TestCase (assertEqual "x_-1_1 = 0" (definite_integrate (makeSyntax "x") (-1) 1) 0),
+                        TestCase (assertEqual "2x_-100_100" (definite_integrate (makeSyntax "2x") (-100) 100) 0),
+                        TestCase (assertEqual "sin x_-2_2" (definite_integrate (makeSyntax "sin x") (-2) 2) 0),
+                        TestCase (assertEqual "sin x_0_pi" (definite_integrate (makeSyntax "sin x") 0 pi) 2)
+                    ]
+
 tests :: Test
 tests = TestList [
                     TestLabel "tokens" tokens,
@@ -178,5 +188,6 @@ tests = TestList [
                     TestLabel "calculations" calculations,
                     TestLabel "simplifyings" simplifyings,
                     TestLabel "derivates" derivates,
-                    TestLabel "indefinite_integrates" indefinite_integrates
+                    TestLabel "indefinite_integrates" indefinite_integrates,
+                    TestLabel "definite_integrates" definite_integrates
                     ]
