@@ -36,7 +36,7 @@ eval ent1 ent2 f img = do
             onError ent2 img
         Right _ -> do
             genImage ent2
-            Gtk.imageSetFromFile img (Just "src/asd.jpeg")            
+            Gtk.imageSetFromFile img (Just "src/graph.jpeg")            
 
 genPoints :: ST.Expression -> [Double] -> [[(Double, Double)]]
 genPoints expr s = map (\l -> map (\d -> (d, N.toDouble (ST.calculate (ST.replace d expr)))) l) 
@@ -48,7 +48,7 @@ genImage ent = do
     let expr = ST.makeSyntax $ T.unpack txt
     let myPoints = genPoints expr $ map (\x -> x / 10.0 ) [0..100]
 
-    toFile def "src/asd.jpeg" $ do
+    toFile def "src/graph.jpeg" $ do
         setColors [opaque blue]
         plot (line "" myPoints)
         return ()
@@ -95,10 +95,10 @@ main = do
     startEndBox <- new Gtk.Box [#orientation := Gtk.OrientationVertical, #spacing := 5]
     #add entryBox startEndBox
 
-    startEntry <- new Gtk.Entry []
-    #add startEndBox startEntry
     endEntry <- new Gtk.Entry []
     #add startEndBox endEntry
+    startEntry <- new Gtk.Entry []
+    #add startEndBox startEntry
 
     entry <- new Gtk.Entry []
     Gtk.widgetSetValign entry Gtk.AlignCenter
