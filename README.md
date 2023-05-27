@@ -5,4 +5,4 @@
 
 <h2> Download </h2>
   <h3> Linux/Ubuntu </h3>
-  <a href="https://github.com/davidhadhazi/Haskell-Alpha/blob/main/Haskell-Alpha.zip" download>Download link</a>
+  <a href="https://github.com/davidhadhazi/Haskell-Alpha/blob/main/Haskell-Alpha.zip" download>Go to file</a>
