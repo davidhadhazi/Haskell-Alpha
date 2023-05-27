@@ -15,7 +15,7 @@ levelUp 0 [] = []
 levelUp a (OP:xs) = levelUp (a + 1) xs
 levelUp a (CL:xs) = levelUp (a - 1) xs
 levelUp a (x :xs) = LeveledToken (x, a) : levelUp a xs
-levelUp _ _ = undefined
+levelUp _ _ = error "Wrong bracket syntax"
 
 instance Ord LeveledToken where
  compare (LeveledToken (t1, n1)) (LeveledToken (t2, n2))
