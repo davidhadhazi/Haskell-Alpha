@@ -10,6 +10,23 @@ isSimple :: Expression -> Bool
 isSimple (SIMPLE _) = True
 isSimple _ = False
 
+-- Decide whether two expressions are the same by a constans multiplier = e1 = a * e2, a <- R
+isMultipleOf :: Expression -> Expression -> Bool
+isMultipleOf (SIMPLE _) (SIMPLE _) = True
+isMultipleOf (UNIX (NEG, e1)) (UNIX (NEG, e2)) = isMultipleOf e1 e2
+isMultipleOf (UNIX (NEG, e1)) e2 = isMultipleOf e1 e2
+isMultipleOf e1 (UNIX (NEG, e2)) = isMultipleOf e1 e2
+isMultipleOf (BINIX (SIMPLE _, MUL, e1)) (BINIX (SIMPLE _, MUL, e2)) = isMultipleOf e1 e2
+isMultipleOf (BINIX (SIMPLE _, MUL, e1)) e2 = isMultipleOf e1 e2
+isMultipleOf e1 (BINIX (SIMPLE _, MUL, e2)) = isMultipleOf e1 e2
+isMultipleOf (BINIX (a1, ADD, b1)) (BINIX (a2, ADD, b2)) = (isMultipleOf a1 a2) && (isMultipleOf b1 b2) && (difference a1 a2) == (difference b1 b2)
+isMultipleOf (BINIX (e1, MUL, e2)) (BINIX (e3, MUL, e4))
+ | isMultipleOf e1 e3 = isMultipleOf e2 e4
+isMultipleOf e1 e2
+ | e1 == e2 = True
+ |otherwise = False
+
+-- Returns the constans of two multiplied expression
 difference :: Expression -> Expression -> Number'
 difference (BINIX (a1, ADD, b1)) (BINIX (a2, ADD, b2))
  | (isMultipleOf a1 a2) && (isMultipleOf b1 b2) && (difference a1 a2) == (difference b1 b2) = difference a1 a2
@@ -32,21 +49,7 @@ difference e1 e2
  | e1 == e2 = Integer 1
  |otherwise = undefined
 
-isMultipleOf :: Expression -> Expression -> Bool
-isMultipleOf (SIMPLE _) (SIMPLE _) = True
-isMultipleOf (UNIX (NEG, e1)) (UNIX (NEG, e2)) = isMultipleOf e1 e2
-isMultipleOf (UNIX (NEG, e1)) e2 = isMultipleOf e1 e2
-isMultipleOf e1 (UNIX (NEG, e2)) = isMultipleOf e1 e2
-isMultipleOf (BINIX (SIMPLE _, MUL, e1)) (BINIX (SIMPLE _, MUL, e2)) = isMultipleOf e1 e2
-isMultipleOf (BINIX (SIMPLE _, MUL, e1)) e2 = isMultipleOf e1 e2
-isMultipleOf e1 (BINIX (SIMPLE _, MUL, e2)) = isMultipleOf e1 e2
-isMultipleOf (BINIX (a1, ADD, b1)) (BINIX (a2, ADD, b2)) = (isMultipleOf a1 a2) && (isMultipleOf b1 b2) && (difference a1 a2) == (difference b1 b2)
-isMultipleOf (BINIX (e1, MUL, e2)) (BINIX (e3, MUL, e4))
- | isMultipleOf e1 e3 = isMultipleOf e2 e4
-isMultipleOf e1 e2
- | e1 == e2 = True
- |otherwise = False
-
+-- There are some integration pattern that can define an integral quicker.
 integrate :: Expression -> Expression
 integrate (SIMPLE n) = BINIX (SIMPLE n, MUL, VAR 'x')
 integrate (BINIX (e1, ADD, e2)) = BINIX (integrate e1, ADD, integrate e2)
@@ -92,13 +95,17 @@ integrate (BINIX (e1, DIV, BINIX (e2, RAI, SIMPLE n)))
  | isMultipleOf (simplifying (derivate e2)) (simplifying e1) = BINIX (SIMPLE (negate (difference (simplifying e1) (simplifying (derivate e2)))), DIV, BINIX (SIMPLE (n - 1), MUL, BINIX (e2, RAI, SIMPLE (n - 1))))
 integrate (BINIX (e1, DIV, e2))
  | isMultipleOf (simplifying (derivate e2)) (simplifying e1) = BINIX (SIMPLE (difference (simplifying e1) (simplifying (derivate e2))), MUL, UNIX (LN, e2))
+integrate (BINIX (VAR x, MUL, e)) = partial_integration (VAR x) e
+integrate (BINIX (BINIX (e1, RAI, SIMPLE n), MUL, e2))
+ | n == round' n && n > 0 = partial_integration (BINIX (e1, RAI, SIMPLE n)) (simplifying e2)
 integrate (BINIX (e1, MUL, e2))
  | isMultipleOf (simplifying (derivate e2)) (simplifying e1) = BINIX (SIMPLE (1 / difference (simplifying (derivate e2)) e1), MUL, BINIX (BINIX (e2, RAI, SIMPLE 2), DIV, SIMPLE 2))
  | isMultipleOf (simplifying (derivate e1)) (simplifying e2) = BINIX (SIMPLE (1 / difference (simplifying (derivate e1)) e2), MUL, BINIX (BINIX (e1, RAI, SIMPLE 2), DIV, SIMPLE 2))
  | isMultipleOf (simplifying (derivate e1)) (simplifying (BINIX (e1, MUL, e2))) = BINIX (e1, DIV, SIMPLE (difference (simplifying (derivate e1)) (simplifying (BINIX (e1, MUL, e2)))))
- |otherwise = partial_integration (simplifying e1) (simplifying e2)
-integrate _ = undefined
+ |otherwise = error "Integrate does not exist, or Haskell-Alpha could not match any pattern to it."
+integrate _ = error "Integrate does not exist, or Haskell-Alpha could not match any pattern to it."
 
+-- A very specific integration method which is needed to be checked beacuse it can go infinity loop easily
 partial_integration :: Expression -> Expression -> Expression
 partial_integration f g' = e where
   f' = simplifying $ derivate f
@@ -107,5 +114,6 @@ partial_integration f g' = e where
    | g' == f' && f == g = BINIX (simplifying (BINIX (f, MUL, g)), DIV, SIMPLE 2)
    |otherwise = BINIX (simplifying (BINIX (f, MUL, g)), MIN, (integrate (simplifying (BINIX (f', MUL, g)))))
 
-definite_integrate :: Expression -> Double -> Double -> Double
-definite_integrate expr start end = (toDouble (calculate (replace end (integrate expr)))) - (toDouble (calculate (replace start (integrate expr))))
+-- Algebrical calculation for definite integral, 
+definite_integrate :: Expression -> Number' -> Number' -> Number'
+definite_integrate expr start end = calculate (replace' end (integrate expr)) - calculate (replace' start (integrate expr))

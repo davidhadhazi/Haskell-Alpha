@@ -1,8 +1,9 @@
-module SyntaxTree (makeSyntax, calculate, replace, reducing, isCalculateable, Expression (..)) where
+module SyntaxTree (makeSyntax, calculate, replace, replace', reducing, isCalculateable, Expression (..)) where
 
 import Tokens
 import Number
 
+-- For the brackets we need this type in order to determine how deep is the operation in the syntaxtree
 newtype LeveledToken = LeveledToken (Token, Int)
  deriving (Eq)
 
@@ -24,6 +25,7 @@ instance Ord LeveledToken where
 fst' :: LeveledToken -> Token
 fst' (LeveledToken (x, _)) = x
 
+-- Class for the expressions, which is a syntaxtree
 data Expression
   = SIMPLE Number'
   | VAR    Char
@@ -50,25 +52,35 @@ instance Ord Expression where
   compare (VAR x) (VAR y) = compare x y
   compare (VAR _) _ = LT
   compare _ (VAR _) = GT
-  compare (UNIX (t1, e1)) (UNIX (t2, e2))
-    | t1 == t2 = compare e1 e2
-    |otherwise = compare t1 t2
-  compare (UNIX _) _ = LT
-  compare _ (UNIX _) = GT
   compare (BINIX (SIMPLE _, MUL, e1)) e2 = compare e1 e2
   compare e1 (BINIX (SIMPLE _, MUL, e2)) = compare e1 e2
   compare (BINIX (e1, RAI, SIMPLE n)) (BINIX (e2, RAI, SIMPLE m))
     | e1 == e2 = compare n m 
     |otherwise = compare e1 e2
   compare (BINIX (_, t1, _)) (BINIX (_, t2, _)) = compare t2 t1
+  compare (BINIX _) _ = LT
+  compare _ (BINIX _) = GT
+  compare (UNIX (t1, e1)) (UNIX (t2, e2))
+    | t1 == t2 = compare e1 e2
+    |otherwise = compare t1 t2
 
+-- For calculating the points for the chart
 replace :: Double -> Expression -> Expression
 replace n (VAR _) = SIMPLE (Creal (realToFrac n))
 replace _ (SIMPLE n) = SIMPLE n
 replace n (UNIX (t, e)) = UNIX (t, replace n e)
 replace n (BINIX (e1, t, e2)) = BINIX (replace n e1, t, replace n e2)
 
+-- For the definite integration
+replace' :: Number' -> Expression -> Expression
+replace' n (VAR _) = SIMPLE n
+replace' _ (SIMPLE n) = SIMPLE n
+replace' n (UNIX (t, e)) = UNIX (t, replace' n e)
+replace' n (BINIX (e1, t, e2)) = BINIX (replace' n e1, t, replace' n e2)
+
+-- It build is the syntaxtree
 buildTree :: [LeveledToken] -> Expression
+buildTree [] = error "Empty or wrong syntax"
 -- One attributed tokens
 buildTree [LeveledToken (NUM   x, _)] = SIMPLE x
 buildTree [LeveledToken (PARAM x, _)] = VAR x
@@ -94,9 +106,11 @@ buildTree tokens = l where
 reducing :: Number' -> Number' -> Number'
 reducing x period = x - period * floor (x / period)
 
+-- Used for the syntaxbuilding from string to expression (does not simplify it)
 makeSyntax :: String -> Expression
 makeSyntax str = buildTree $ levelUp 0 $ fillingUp $ stringToTokens str
 
+-- Some mathematical expression can't be calculated (such as 1/0)
 isCalculateable :: Expression -> Bool
 isCalculateable (BINIX (e1, DIV, e2)) = isCalculateable e1 && isCalculateable e2 && calculate e2 /= (Creal 0)
 isCalculateable (BINIX (e1, LOG, e2)) = isCalculateable (BINIX (UNIX (LN, e2), DIV, UNIX (LN, e1)))
@@ -111,6 +125,7 @@ isCalculateable (UNIX (_, e)) = isCalculateable e
 isCalculateable (SIMPLE _) = True
 isCalculateable (VAR _) = False
 
+-- Calculates a number from the expression (does not checks whether it is calculateable or not)
 calculate :: Expression -> Number'
 calculate (SIMPLE x)       = x
 calculate (UNIX (NEG, expr)) = negate $ calculate expr
@@ -138,21 +153,21 @@ calculate (UNIX (CTG, expr)) = calculate (BINIX (UNIX (COS, expr), DIV, UNIX (SI
 calculate (BINIX (exp1, LOG, exp2)) = calculate (BINIX (UNIX (LN, exp2), DIV, UNIX (LN, exp1)))
 calculate (UNIX (LOG10, expr)) = calculate (BINIX (UNIX (LN, expr), DIV, UNIX (LN, SIMPLE 10)))
 calculate (UNIX (LN, expr)) 
- | round' (calculate expr) == Integer 0 = undefined 
+ | round' (calculate expr) <= Integer 0 = error "Log of zero or negative number"
  |otherwise = round' $ log $ calculate expr
 calculate (BINIX (exp1, ADD, exp2)) = round' $  (+) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MIN, exp2)) = round' $  (-) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, MUL, exp2)) = round' $  (*) (calculate exp1) (calculate exp2)
-calculate (BINIX (exp1, DIV, exp2)) = round' $  (/) (calculate exp1) (calculate exp2)
+calculate (BINIX (exp1, DIV, exp2)) = if (0 == calculate exp2) then error "Division by zero" else round' $  (/) (calculate exp1) (calculate exp2)
 calculate (BINIX (exp1, RAI, exp2))
- | round' (calculate exp1) == Integer 0 && round' (calculate exp2) == Integer 0 = undefined
+ | round' (calculate exp1) == Integer 0 && round' (calculate exp2) == Integer 0 = error "Zero on the power of zero"
  | round' (calculate exp1) == Integer 0 = Integer 0
  | round' (calculate exp2) == Integer 0 = Integer 1
  | round' (calculate exp1) == Integer 1 = Integer 1
  | round' (calculate exp1) == Integer 0 = Integer 0
  | (calculate exp1) < 0 = case (calculate exp2) of
-    Integer n -> if n > 0 then calculate (BINIX (exp1, MUL, BINIX (exp1, RAI, SIMPLE ((calculate exp2) - 1)))) else undefined
-    _ -> undefined
+    Integer n -> if n > 0 then calculate (BINIX (exp1, MUL, BINIX (exp1, RAI, SIMPLE ((calculate exp2) - 1)))) else 
+                               calculate $ BINIX (SIMPLE 1, DIV, BINIX (SIMPLE (calculate exp1), RAI, SIMPLE (negate (calculate exp2))))
+    _ -> error "Root of a negative number"
  |otherwise = round' $ (**) (calculate exp1) (calculate exp2)
-calculate _ = undefined
-
+calculate _ = error "Not a valid number"

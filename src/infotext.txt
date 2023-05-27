@@ -1,0 +1,9 @@
+Welcome to my Haskell-Alpha application, where you can derivate, and integrate your expressions.
+
+There are some simple advice for this progam before you use it.
+
+1)  This program (currently) can only process one variable expressions.
+    Please use for that the letter 'x'.
+    
+2)  On the top right corner the two inputs are for the definite integration (the upper one is the end, and the lower one is the start)
+    If you want to calculate the indefinite integral, then clear the start and the end inputs. (In the indefinite integration assume c = 0)

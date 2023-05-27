@@ -1,5 +1,7 @@
 module Number (Number' (..), round', toDouble, isInteger) where
 
+-- My own number for calculations
+
 import GHC.Real
 import CReal
 

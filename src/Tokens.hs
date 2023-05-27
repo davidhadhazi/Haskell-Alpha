@@ -4,6 +4,7 @@ import Number
 import CReal
 import Data.Char
 
+-- Class for the translated syntax
 data Token
  = ADD
  | MIN
@@ -48,12 +49,14 @@ instance Show Token where
     show (PURE n) = show n 
     show _ = undefined
 
+-- To define the connects to it's expression
 isInfixR :: Token -> Bool
 isInfixR RAI = True
 isInfixR LOG = True
 isInfixR NEG = True
 isInfixR _ = False
 
+-- A number can only be a leaf in the syntaxtree
 isOperator :: Token -> Bool
 isOperator (PURE _) = False
 isOperator (NUM _) = False
@@ -63,6 +66,7 @@ isOperator PI = False
 isOperator CL = False
 isOperator _ = True
 
+-- Makes the pure translated language to a mathematical correct one
 fillingUp :: [Token] -> [Token]
 fillingUp [] = []
 fillingUp ((PURE n):(PARAM p):ts) = NUM (Integer n) : MUL : fillingUp (PARAM p:ts)
@@ -90,6 +94,7 @@ dropColumns n (CL : s) = dropColumns (n-1) s
 dropColumns n (_ : s) = dropColumns n s
 dropColumns _ _ = undefined
 
+-- Transforms string to a pure list of tokens
 stringToTokens :: String -> [Token]
 stringToTokens [] = []
 stringToTokens ('+':            s) = ADD   : stringToTokens s
@@ -116,4 +121,4 @@ stringToTokens ('c':'t':'g':    s) = CTG   : stringToTokens s
 stringToTokens ('x':            s) = PARAM 'x' : stringToTokens s
 stringToTokens (x:xs)
  | isDigit x  = PURE (read (takeWhile isDigit (x:xs))) : stringToTokens (dropWhile isDigit (x:xs))
-stringToTokens _ = undefined
+stringToTokens _ = error "Unvalid token."

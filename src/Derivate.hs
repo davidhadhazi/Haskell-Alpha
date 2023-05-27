@@ -21,5 +21,5 @@ derivate (UNIX (LN, e)) = BINIX (derivate e, DIV, e)
 derivate (UNIX (SIN, e)) = BINIX (UNIX (COS, e), MUL, derivate e)
 derivate (UNIX (COS, e)) = BINIX (UNIX (NEG, UNIX (SIN, e)), MUL, derivate e)
 derivate (UNIX (TAN, e)) = derivate $ BINIX (UNIX (SIN, e), DIV, UNIX (COS, e))                                
-derivate (UNIX (CTG, e)) = derivate $ BINIX (UNIX (COS, e), DIV, UNIX (SIN, e))
+derivate (UNIX (CTG, e)) = BINIX (UNIX (NEG, derivate e), DIV, BINIX (UNIX (SIN, e), RAI, SIMPLE 2))
 derivate _ = undefined

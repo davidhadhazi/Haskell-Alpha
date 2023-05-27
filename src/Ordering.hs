@@ -1,3 +1,7 @@
+-- For proper syntaxes we need to specify an order between the expressions in order to correct summation
+-- For example x + sin x + x -> haskell can't match a pattern where the are 2 x in a summation, we need to reorder
+-- x + sin x + x -> x + x + sin x (-> 2x + sin x)
+
 module Ordering (ordering) where
 
 import Tokens
@@ -6,6 +10,7 @@ import Data.List (sort)
 
 orderingSum, orderingMul, ordering :: Expression -> Expression
 
+--Full order requires order in sums and products
 ordering = orderingMul . orderingSum
 
 orderingSum (BINIX (e1, ADD, BINIX (e2, ADD, e3))) = list where

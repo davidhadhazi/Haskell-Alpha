@@ -8,6 +8,7 @@ import Simplification
 import Derivate
 import Integrate
 
+-- Tests for the tokenization
 tokens :: Test
 tokens = TestList[
                   TestCase (assertEqual "empty" (stringToTokens "") []),
@@ -33,6 +34,7 @@ tokens = TestList[
                   TestCase (assertEqual ")" (stringToTokens ")") [CL])
                   ]
 
+-- Tests for the syntaxbuilding
 syntaxes :: Test
 syntaxes = TestList[
                     TestCase (assertEqual "1" (makeSyntax "1") (SIMPLE 1)),
@@ -48,6 +50,7 @@ syntaxes = TestList[
                     TestCase (assertEqual "ctg e" (makeSyntax "ctg e") (UNIX (CTG, SIMPLE (exp 1))))
                     ]
 
+-- Tests for the mathematical calculations
 calculations :: Test
 calculations = TestList [
                      TestCase (assertEqual "calculation1+1" (calculate (makeSyntax "1+1")) (Integer 2)),
@@ -65,6 +68,7 @@ calculations = TestList [
                      TestCase (assertEqual "calculation_raise2" (calculate (makeSyntax "256 ^ (1/4)")) (Integer 4))
                      ]
 
+-- Tests for the simplification
 simplifyings :: Test
 simplifyings = TestList [
                     TestCase (assertEqual "x = x" (simplifying (makeSyntax "x")) (VAR 'x')),
@@ -93,7 +97,7 @@ simplifyings = TestList [
                     TestCase (assertEqual "11x + 5 * cos x + 9x = 20x + cos x" (simplifying (makeSyntax "11x + 5 * cos x + 9x")) (makeSyntax "20x + 5 *cos x")),
                     TestCase (assertEqual "6x - 5x = x" (simplifying (makeSyntax "6x - 5x")) (makeSyntax "x")),
                     TestCase (assertEqual "2 * x * x = 2 * x^2" (simplifying (makeSyntax "2 * x * x")) (makeSyntax "2 * x^2")),
-                    TestCase (assertEqual "log x * x * 2x = 2 * x^2 * log x" (simplifying (makeSyntax "log x * x * 2x")) (makeSyntax "2 * (log x * x^2)")),
+                    TestCase (assertEqual "log x * x * 2x = 2 * x^2 * log x" (simplifying (makeSyntax "log x * x * 2x")) (makeSyntax "2 * (x^2 * log x)")),
                     TestCase (assertEqual "log x + 6x - 5x = x" (simplifying (makeSyntax "log x + 6x - 5x")) (makeSyntax "x + log x")),
                     TestCase (assertEqual "6x + 3 - 5x = x" (simplifying (makeSyntax "6x + 3 - 5x")) (makeSyntax "3 + x")),
                     TestCase (assertEqual "log x + 5x - 6x = x" (simplifying (makeSyntax "log x + 5x - 6x")) (makeSyntax "-x + log x")),
@@ -104,6 +108,7 @@ simplifyings = TestList [
                     TestCase (assertEqual "4 * cos x^2 + 4 * sin x^2 = 4" (simplifying (makeSyntax "4 * cos x^2 + 4 * sin x^2")) (makeSyntax "4"))
                 ]
 
+-- Tests for the derivates (requires a perfect simplification)
 derivates :: Test
 derivates = TestList [
                     TestCase (assertEqual "0' = 0" (simplifying (derivate (makeSyntax "0"))) (makeSyntax "0")),
@@ -128,6 +133,7 @@ derivates = TestList [
                     TestCase (assertEqual "x^x' = x^x * (1 + ln x)" (simplifying (derivate (makeSyntax "x^x"))) (makeSyntax "x^x * (1 + ln x)"))
                     ]
 
+-- Tests for the implemented indefinite integral cases (requires a perfect simplification)
 indefinite_integrates :: Test
 indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_0" (simplifying (integrate (makeSyntax "0"))) (makeSyntax "0")),
@@ -171,6 +177,7 @@ indefinite_integrates = TestList [
                                 TestCase (assertEqual "integrate_x^x * (1 + ln x)" (simplifying (integrate (simplifying (makeSyntax "x^x * (1 + ln x)")))) (makeSyntax "x^x"))
                                 ]
 
+-- Tests for the definnite integration
 definite_integrates :: Test
 definite_integrates = TestList[
                         TestCase (assertEqual "1_0_1 = 1" (definite_integrate (makeSyntax "1") 0 1) 1),
@@ -181,6 +188,7 @@ definite_integrates = TestList[
                         TestCase (assertEqual "sin x_0_pi" (definite_integrate (makeSyntax "sin x") 0 pi) 2)
                     ]
 
+-- Collection of the tests
 tests :: Test
 tests = TestList [
                     TestLabel "tokens" tokens,

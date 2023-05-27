@@ -1,3 +1,5 @@
+-- This file was imported from the CReal package
+
 module CReal (CReal) where
 
 import Data.Ratio

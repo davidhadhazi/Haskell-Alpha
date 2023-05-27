@@ -3,13 +3,18 @@ module Summation (summation) where
 import Tokens
 import SyntaxTree
 
+-- We can sum sums, products, and simple numbers
 summation, summationSum, summationProd, summationSimples :: Expression -> Expression
 summation = summationSimples . summationProd . summationSum
 
+-- Sum of simple numbers
 summationSimples (BINIX (SIMPLE 0, MUL, _)) = SIMPLE 0
 summationSimples (BINIX (SIMPLE 1, MUL, e)) = summation e
 summationSimples (BINIX (e, DIV, SIMPLE 1)) = summation e
-summationSimples (BINIX (SIMPLE 0, RAI, SIMPLE 0)) = undefined
+summationSimples (BINIX (SIMPLE 0, RAI, SIMPLE n))
+ | n < 0 = error "Division by zero"
+ | n == 0 = error "Zero on the power of zero"
+ |otherwise = SIMPLE 0
 summationSimples (BINIX (SIMPLE n, t, SIMPLE m)) = SIMPLE (calculate (BINIX (SIMPLE n, t, SIMPLE m)))
 summationSimples (BINIX (SIMPLE 0, ADD, e)) = summation e
 summationSimples (BINIX (_, RAI, SIMPLE 0)) = SIMPLE 1
@@ -28,6 +33,7 @@ summationSimples (UNIX (t, SIMPLE n)) = SIMPLE (calculate (UNIX (t, SIMPLE n)))
 summationSimples (UNIX (t, e)) = UNIX (t, summation e)
 summationSimples e = e
 
+-- Sum of sums
 summationSum (BINIX (e1, ADD, e2))
  | e1 == e2 = summation $ BINIX (SIMPLE 2, MUL, e1)
 summationSum (BINIX (e1, ADD, BINIX (SIMPLE a, MUL, e2)))
@@ -58,6 +64,7 @@ summationSum (UNIX (t, e)) = UNIX (t, summation e)
 summationSum (VAR x) = VAR x
 summationSum (SIMPLE n) = SIMPLE n
 
+-- Sum of products
 summationProd (BINIX (e1, MUL, e2))
  | e1 == e2 = summation $ BINIX (e1, RAI, SIMPLE 2)
 summationProd (BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE n)))
@@ -67,6 +74,8 @@ summationProd (BINIX (BINIX (e1, RAI, SIMPLE n), MUL, BINIX (e2, RAI, SIMPLE m))
 -----------------------------------------------------------------------------
 summationProd (BINIX (e1, MUL, BINIX (e2, MUL, f)))
  | e1 == e2 = summation $ BINIX (BINIX (e1, RAI, SIMPLE 2), MUL, f)
+summationProd (BINIX (e1, MUL, BINIX (BINIX (e2, RAI, SIMPLE n), MUL, f)))
+ | e1 == e2 = summation $ BINIX (BINIX (e1, RAI, SIMPLE (n + 1)), MUL, f)
 -----------------------------------------------------------------------------
 summationProd (BINIX (e1, t, e2)) = BINIX (summation e1, t, summation e2)
 summationProd (UNIX (t, e)) = UNIX (t, summation e)

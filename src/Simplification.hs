@@ -1,3 +1,4 @@
+-- Derivation and integration can produce very 
 module Simplification (simplifying) where
 
 import SyntaxTree
@@ -5,6 +6,7 @@ import Tokens
 import Ordering
 import Summation
 
+-- Some expression can be simplified early, some need to be remake to a standardized expression (such as: x - x -> x + (-1) * x)
 unbracketing :: Expression -> Expression
 unbracketing (BINIX (SIMPLE n, MUL, BINIX (e1, ADD, e2))) = unbracketing $ BINIX (BINIX (SIMPLE n, MUL, e1), ADD, BINIX (SIMPLE n, MUL, e2))
 unbracketing (UNIX (NEG, UNIX (NEG, e))) = unbracketing e
@@ -44,6 +46,7 @@ unbracketing (UNIX (t, e)) = UNIX (t, unbracketing e)
 unbracketing (SIMPLE n) = SIMPLE n
 unbracketing (VAR    x) = VAR    x
 
+-- Correct brackets for the tranzitive operations
 rebracketing :: Expression -> Expression
 rebracketing (BINIX (BINIX (e1, ADD, e2), ADD, BINIX (e3, ADD, e4))) = rebracketing (BINIX (e1, ADD, (BINIX (e2, ADD, BINIX (e3, ADD, e4)))))
 rebracketing (BINIX (BINIX (e1, ADD, e2), ADD, e3)) = rebracketing (BINIX (e1, ADD, (BINIX (e2, ADD, e3))))
@@ -54,6 +57,7 @@ rebracketing (BINIX (BINIX (e1, MUL, e2), MUL, e3)) = rebracketing (BINIX (e1, M
 rebracketing (BINIX (e1, MUL, BINIX (e2, MUL, e3))) = BINIX (e1, MUL, rebracketing (BINIX (e2, MUL, e3)))
 rebracketing e = e
 
+-- Transforms back the expression to make it more readable (such as: 2 + (-1) * x -> 2 - x)
 negation :: Expression -> Expression
 negation (BINIX (e1, ADD, BINIX (SIMPLE (-1), MUL, e2))) = negation $ BINIX (e1, MIN, e2)
 negation (BINIX (e1, ADD, BINIX (SIMPLE a, MUL, e2)))
@@ -66,6 +70,7 @@ negation (BINIX (e, RAI, SIMPLE (-1))) = negation $ BINIX (SIMPLE 1, DIV, e)
 negation (BINIX (e, RAI, SIMPLE n))
  | n < 0 = negation $ BINIX (SIMPLE 1, DIV, BINIX (e, RAI, SIMPLE (negate n)))
 negation (BINIX (e1, MUL, BINIX (e2, RAI, SIMPLE n)))
+ | n == -1 = negation $ BINIX (e1, DIV, e2)
  | n < 0 = negation $ BINIX (e1, DIV, BINIX (e2, RAI, SIMPLE (negate n)))
 -------------------------------------------------------------------------------
 negation (BINIX (SIMPLE (-1), MUL, e)) = negation $ UNIX (NEG, e)
@@ -74,6 +79,7 @@ negation (BINIX (e1, t, e2)) = BINIX (negation e1, t, negation e2)
 negation (UNIX (t, e)) = UNIX (t, negation e)
 negation e = e
 
+-- The simplification is a composition of multiple functions
 simplifying :: Expression -> Expression
 simplifying e = if e == negation (summation (ordering (rebracketing (unbracketing e))))
      then e else simplifying $ negation $ summation $ ordering $ rebracketing $ unbracketing e
